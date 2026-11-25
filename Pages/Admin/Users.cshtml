@@ -1,0 +1,97 @@
+@page
+@model NavidGelato_Site.Pages.Admin.UsersModel
+@using NavidGelato_Site.Security
+@inject IAdminPermissionService PermissionService
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "کاربران و دسترسی‌ها";
+    var canCreate = await PermissionService.HasAsync(User, AdminPermissions.Users.Create);
+    var canEdit = await PermissionService.HasAsync(User, AdminPermissions.Users.Edit);
+    var canPermissions = await PermissionService.HasAsync(User, AdminPermissions.Users.ManagePermissions);
+    var canReset = await PermissionService.HasAsync(User, AdminPermissions.Users.ResetPassword);
+    var canUnlock = await PermissionService.HasAsync(User, AdminPermissions.Users.Unlock);
+    var canDelete = await PermissionService.HasAsync(User, AdminPermissions.Users.Delete);
+    var canSave = Model.Form.Id is null ? canCreate : canEdit;
+    var editorOpen = Model.Request.Query.ContainsKey("create") || Model.Request.Query.ContainsKey("editId") || !ViewData.ModelState.IsValid;
+}
+<div class="admin-page-head">
+    <div><span>امنیت و دسترسی</span><h1>کاربران پنل مدیریت</h1></div>
+    @if (canCreate){<a class="admin-primary link-btn" asp-page="/Admin/Users" asp-route-create="1">کاربر جدید</a>}
+</div>
+
+<div class="admin-modal-list-layout">
+    <div class="admin-panel admin-list-panel">
+        <h2>لیست کاربران</h2>
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead><tr><th>کاربر</th><th>نام نمایشی</th><th>وضعیت</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    var locked = Model.IsLocked(item);
+                    <tr>
+                        <td dir="ltr">@item.UserName</td><td>@item.DisplayName</td>
+                        <td>@if (locked){<span class="status pending">قفل شده</span>}else{<span class="status @(item.IsEnabled ? "on" : "off")">@(item.IsEnabled ? "فعال" : "غیرفعال")</span>}</td>
+                        <td class="table-actions">
+                            @if (canEdit){<a asp-page="/Admin/Users" asp-route-editId="@item.Id">مشاهده / ویرایش</a>}
+                            @if (locked && canUnlock){<form method="post" asp-page-handler="Unlock"><input type="hidden" name="userId" value="@item.Id" /><button type="submit">رفع قفل</button></form>}
+                            @if (canDelete){<form method="post" asp-page-handler="Delete" onsubmit="return confirm('این کاربر حذف شود؟')"><input type="hidden" name="userId" value="@item.Id" /><button class="text-danger" type="submit">حذف</button></form>}
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="admin-panel admin-editor-panel admin-editor-wide @(editorOpen ? "is-open" : "")" data-admin-editor-modal data-admin-editor-close-url="/Admin/Users">
+        <div class="admin-editor-head"><div><h2>@(Model.Form.Id is null ? "کاربر جدید" : "ویرایش کاربر")</h2><p>مشخصات حساب و دسترسی‌های پنل را تنظیم کنید.</p></div><a class="admin-editor-close" asp-page="/Admin/Users" aria-label="بستن">×</a></div>
+        @if (canSave)
+        {
+            <form method="post" asp-page-handler="Save" class="admin-form">
+                <input type="hidden" asp-for="Form.Id" />
+                <div class="form-row"><label>نام نمایشی<input asp-for="Form.DisplayName" /></label><label>نام کاربری<input asp-for="Form.UserName" dir="ltr" /></label><label>شماره تماس<input asp-for="Form.PhoneNumber" dir="ltr" /></label></div>
+                @if (Model.Form.Id is null){<label>رمز اولیه<input asp-for="Form.Password" type="password" dir="ltr" autocomplete="new-password" /><small>در اولین ورود باید تغییر کند.</small></label>}
+                @if (!Model.EditingSuperAdmin){<label class="switch-label"><input asp-for="Form.IsEnabled" type="checkbox" /> حساب فعال باشد</label>}
+
+                @if (canPermissions && !Model.EditingSuperAdmin)
+                {
+                    <div class="permission-editor">
+                        <div class="permission-editor-head"><h3>دسترسی‌ها</h3><small>هر بخش را باز کنید و دسترسی‌های جزئی را تنظیم کنید.</small></div>
+                        <div class="permission-auto-note">انتخاب هر عملیات، دسترسی مشاهده همان صفحه را هم خودکار فعال و ذخیره می‌کند.</div>
+                        @foreach (var group in Model.PermissionDefinitions.GroupBy(x => x.Group))
+                        {
+                            var groupPermissions = group.ToList();
+                            var selectedCount = groupPermissions.Count(x => Model.SelectedPermissions.Contains(x.Key));
+                            var viewPermission = groupPermissions.FirstOrDefault(x => x.Key.EndsWith(".View", StringComparison.Ordinal));
+                            if (selectedCount > 0)
+                            {
+                                <details class="permission-group has-selection" data-permission-group open>
+                                    <summary><div class="permission-group-title"><span class="permission-group-chevron">⌄</span><b>@group.Key</b><span class="permission-group-count" data-permission-count>@selectedCount.ToString("N0") از @groupPermissions.Count.ToString("N0")</span></div><label class="permission-master-wrap" onclick="event.stopPropagation()"><input type="checkbox" data-permission-master /><span>انتخاب همه</span></label></summary>
+                                    <div class="permission-group-body">
+                                    @foreach (var permission in groupPermissions){var isView = viewPermission?.Key == permission.Key;<label class="permission-check">@if(Model.SelectedPermissions.Contains(permission.Key)){<input type="checkbox" name="GrantedPermissions" value="@permission.Key" checked data-permission-view="@(isView ? "true" : "false")" />}else{<input type="checkbox" name="GrantedPermissions" value="@permission.Key" data-permission-view="@(isView ? "true" : "false")" />}<span>@permission.Title</span></label>}
+                                    </div>
+                                </details>
+                            }
+                            else
+                            {
+                                <details class="permission-group" data-permission-group>
+                                    <summary><div class="permission-group-title"><span class="permission-group-chevron">⌄</span><b>@group.Key</b><span class="permission-group-count" data-permission-count>۰ از @groupPermissions.Count.ToString("N0")</span></div><label class="permission-master-wrap" onclick="event.stopPropagation()"><input type="checkbox" data-permission-master /><span>انتخاب همه</span></label></summary>
+                                    <div class="permission-group-body">@foreach (var permission in groupPermissions){var isView = viewPermission?.Key == permission.Key;<label class="permission-check"><input type="checkbox" name="GrantedPermissions" value="@permission.Key" data-permission-view="@(isView ? "true" : "false")" /><span>@permission.Title</span></label>}</div>
+                                </details>
+                            }
+                        }
+                    </div>
+                }
+                <div asp-validation-summary="All" class="validation-summary"></div>
+                <button class="admin-primary" type="submit">ذخیره کاربر</button>
+            </form>
+        }
+        @if (Model.Form.Id is not null && canReset)
+        {
+            <form method="post" asp-page-handler="ResetPassword" class="admin-form inline-admin-form"><input type="hidden" name="userId" value="@Model.Form.Id" /><label>تعیین رمز جدید<input type="password" name="newPassword" dir="ltr" autocomplete="new-password" /></label><button class="admin-secondary" type="submit">تغییر رمز کاربر</button></form>
+        }
+    </div>
+</div>
+@section Head { <link rel="stylesheet" href="~/css/admin-permissions.css" asp-append-version="true" /> }
+@section Scripts { <script src="~/js/admin-permissions.js" asp-append-version="true"></script> }

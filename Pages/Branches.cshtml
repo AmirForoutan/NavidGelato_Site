@@ -1,0 +1,164 @@
+@page
+@model BranchesModel
+@using System.Globalization
+@using System.Text.Json
+@using NavidGelato_Site.Models
+@using NavidGelato_Site.Services
+@{
+    ViewData["Title"] = "شعب نوید ژلاتو | آدرس، تلفن و مسیریابی مستقیم";
+    ViewData["Description"] = "آدرس و تلفن شعب نوید ژلاتو در کرج، تهران، اهواز و شهرهای دیگر؛ پیدا کردن نزدیک‌ترین شعبه و مسیریابی با نقشه دستگاه، نشان، بلد، Waze و Google Maps.";
+    ViewData["Canonical"] = "https://navidgelato.example/branches";
+    var now = IranClock.Now;
+    var openBranches = Model.Branches.Where(x => x.Status == BranchStatus.Open || (x.Status == BranchStatus.OpeningSoon && x.OpeningDateTime.HasValue && x.OpeningDateTime.Value <= now)).ToList();
+    var httpRequest = ViewContext.HttpContext.Request;
+    var storeImagePath = Url.Content(SiteContentService.StoreImage);
+    var storeImageUrl = $"{httpRequest.Scheme}://{httpRequest.Host}{storeImagePath}";
+}
+<div class="public-motion-page branches-page">
+    <section class="page-hero branches-page-hero">
+        <div class="container branches-hero-grid">
+            <div data-motion-reveal>
+                <span class="eyebrow"><i></i> NAVID GELATO LOCATIONS</span>
+                <h1>نوید ژلاتو،<br /><span>نزدیک‌تر از چیزی که فکر می‌کنی.</span></h1>
+                <div class="branches-hero-stats">
+                    <div><b>@Model.Branches.Count</b><span>شعبه ثبت‌شده</span></div>
+                    <div><b>@openBranches.Count</b><span>شعبه دایر</span></div>
+                    <div><b>۵</b><span>روش مسیریابی</span></div>
+                </div>
+            </div>
+            <div class="branches-hero-visual" aria-hidden="true">
+                <div class="branches-hero-radar"></div>
+                <div class="branches-hero-pin"><svg viewBox="0 0 32 32"><path d="M16 29s9-7.2 9-16A9 9 0 1 0 7 13c0 8.8 9 16 9 16Z"/><circle cx="16" cy="13" r="3.2"/></svg></div>
+                <i class="branches-hero-dot one"></i><i class="branches-hero-dot two"></i><i class="branches-hero-dot three"></i>
+            </div>
+        </div>
+    </section>
+
+    <section class="section branches-section">
+        <div class="container">
+            <div class="nearest-branch-panel" data-nearest-panel data-motion-reveal>
+                <div><span class="section-kicker">نزدیک‌ترین شعبه</span><h2>نزدیک‌ترین نوید ژلاتو به خودت رو پیدا کن.</h2><p data-location-status>فقط شعب دایر در محاسبه نزدیک‌ترین شعبه در نظر گرفته می‌شوند.</p></div>
+                <button class="btn btn-primary" type="button" data-find-nearest>پیدا کردن نزدیک‌ترین شعبه</button>
+                <div class="nearest-radar" aria-hidden="true"><i></i><i></i><i></i></div>
+            </div>
+
+            <div class="branch-toolbar" data-motion-reveal>
+                <div class="search-box"><span>⌕</span><input type="search" id="branch-search" placeholder="جستجو در نام شهر، شعبه یا آدرس..." autocomplete="off" /></div>
+                <span id="branch-count">@Model.Branches.Count شعبه</span>
+            </div>
+
+            <div class="branches-grid" id="branches-grid">
+                @{ var branchIndex = 0; }
+                @foreach (var branch in Model.Branches)
+                {
+                    var hasCoordinates = branch.HasCoordinates;
+                    var isUpcomingOpening = branch.Status == BranchStatus.OpeningSoon && branch.OpeningDateTime.HasValue && branch.OpeningDateTime.Value > now;
+                    var effectiveStatus = branch.Status == BranchStatus.OpeningSoon && !isUpcomingOpening ? BranchStatus.Open : branch.Status;
+                    var statusClass = effectiveStatus switch { BranchStatus.SettingUp => "setting-up", BranchStatus.OpeningSoon => "opening-soon", _ => "open" };
+                    var statusText = effectiveStatus switch { BranchStatus.SettingUp => "در حال راه‌اندازی", BranchStatus.OpeningSoon => "افتتاح به‌زودی", _ => string.Empty };
+                    var openingExpiry = isUpcomingOpening ? branch.OpeningDateTime!.Value.ToString("yyyy-MM-dd'T'HH:mm:ss", CultureInfo.InvariantCulture) + "+03:30" : null;
+                    var latitudeText = hasCoordinates ? branch.Latitude!.Value.ToString(CultureInfo.InvariantCulture) : string.Empty;
+                    var longitudeText = hasCoordinates ? branch.Longitude!.Value.ToString(CultureInfo.InvariantCulture) : string.Empty;
+                    var geoUrl = hasCoordinates ? $"geo:{latitudeText},{longitudeText}" : null;
+                    var delay = (branchIndex % 6) * 65;
+                    branchIndex++;
+
+                    <article id="branch-@branch.Id" class="branch-card @(branch.IsCentral ? "central" : "") @statusClass"
+                             data-motion-card style="--motion-delay:@(delay)ms"
+                             data-branch="@($"{branch.Name} {branch.City} {branch.Address} {statusText}")" data-branch-id="@branch.Id" data-status="@((int)effectiveStatus)"
+                             data-lat="@latitudeText" data-lng="@longitudeText" data-opening-expiry="@openingExpiry">
+                        <div class="branch-card-head">
+                            <div><span>@branch.City</span><h2>@branch.Name</h2></div>
+                            <div class="branch-badges">
+                                @if (branch.IsCentral)
+                                {
+                                    <b class="central-badge">مرکزی</b>
+                                }
+                                @if (effectiveStatus != BranchStatus.Open)
+                                {
+                                    <b class="branch-status-badge @statusClass" data-opening-only="@(isUpcomingOpening ? "true" : null)">@statusText</b>
+                                }
+                                <b class="nearest-badge" hidden data-nearest-badge>نزدیک‌ترین</b>
+                            </div>
+                        </div>
+                        <p class="branch-address">@branch.Address</p>
+
+                        @if (isUpcomingOpening)
+                        {
+                            <div class="opening-event" data-opening-only="true"><span>زمان افتتاح</span><strong>@branch.GetOpeningDateTimeText()</strong></div>
+                        }
+                        else if (effectiveStatus == BranchStatus.SettingUp)
+                        {
+                            <div class="branch-progress-note">این شعبه در حال آماده‌سازی است.</div>
+                        }
+
+                        <div class="branch-distance" hidden data-branch-distance></div>
+                        @if (branch.Phones.Count > 0)
+                        {
+                            <div class="branch-phones">@foreach (var phone in branch.Phones.OrderBy(x => x.SortOrder)){
+                                <a href="tel:@phone.PhoneNumber" dir="ltr">@phone.PhoneNumber</a>
+                            }</div>
+                        }
+
+                        <details class="branch-more">
+                            <summary>مسیریابی و اطلاعات بیشتر <span>+</span></summary>
+                            <div class="branch-more-content">
+                                <div class="map-actions map-actions-visual">
+                                    @if (hasCoordinates)
+                                    {
+                                        <a class="map-provider geo" href="@geoUrl" aria-label="باز کردن مختصات در مسیریاب دستگاه" title="مسیریاب دستگاه"><span class="map-logo map-logo-geo" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s7-5.3 7-12a7 7 0 1 0-14 0c0 6.7 7 12 7 12Z" /><circle cx="12" cy="9" r="2.4" /></svg></span><span class="sr-only">مسیریاب دستگاه</span></a>
+                                    }
+                                    <a class="map-provider neshan" href="@branch.GetNeshanUrl()" target="_blank" rel="noopener" aria-label="مسیریابی با نشان" title="نشان"><span class="map-logo map-logo-neshan" aria-hidden="true">ن</span><span class="sr-only">نشان</span></a>
+                                    <a class="map-provider balad" href="@branch.GetBaladUrl()" target="_blank" rel="noopener" aria-label="مسیریابی با بلد" title="بلد"><span class="map-logo map-logo-balad" aria-hidden="true">ب</span><span class="sr-only">بلد</span></a>
+                                    <a class="map-provider waze" href="@branch.GetWazeUrl()" target="_blank" rel="noopener" aria-label="مسیریابی با Waze" title="Waze"><span class="map-logo map-logo-waze" aria-hidden="true">W</span><span class="sr-only">Waze</span></a>
+                                    <a class="map-provider google" href="@branch.GetGoogleMapsUrl()" target="_blank" rel="noopener" aria-label="مسیریابی با Google Maps" title="Google Maps"><span class="map-logo map-logo-google" aria-hidden="true">G</span><span class="sr-only">Google Maps</span></a>
+                                </div>
+                            </div>
+                        </details>
+                    </article>
+                }
+            </div>
+            <div class="empty-state" id="branch-empty" hidden>شعبه‌ای با این عبارت پیدا نشد.</div>
+        </div>
+    </section>
+
+    <section class="branch-route-guide">
+        <div class="container">
+            <div class="branch-route-head" data-motion-reveal><div><span class="section-kicker light">راه رسیدن ساده‌ست</span><h2>سه قدم تا نزدیک‌ترین نوید ژلاتو.</h2></div><p>موقعیتت رو بده، شعبه رو انتخاب کن و با مسیریاب مورد علاقه‌ات حرکت کن. بقیه‌اش فقط تصمیم درباره ساندویچه.</p></div>
+            <div class="branch-route-grid">
+                <article class="branch-route-step" data-step="01" data-motion-card><span>01 / LOCATION</span><h3>موقعیتت رو پیدا کن</h3><p>با دکمه نزدیک‌ترین شعبه، فقط شعب دایر و دارای مختصات بررسی می‌شوند.</p></article>
+                <article class="branch-route-step" data-step="02" data-motion-card style="--motion-delay:90ms"><span>02 / CHOOSE</span><h3>شعبه مناسب رو انتخاب کن</h3><p>آدرس، تلفن، وضعیت افتتاح و فاصله تقریبی کنار هم نمایش داده می‌شوند.</p></article>
+                <article class="branch-route-step" data-step="03" data-motion-card style="--motion-delay:180ms"><span>03 / GO</span><h3>با مسیریابت برو</h3><p>نشان، بلد، Waze، Google Maps یا مسیریاب خود دستگاه؛ هرکدوم راحت‌تری.</p></article>
+            </div>
+        </div>
+    </section>
+</div>
+@section Head {
+    <script type="application/ld+json">
+        @Html.Raw(JsonSerializer.Serialize(new
+        {
+                @context = "https://schema.org",
+                @type = "ItemList",
+                name = "شعب دایر نوید ژلاتو",
+                numberOfItems = openBranches.Count,
+                itemListElement = openBranches.Select((branch, index) => new
+                {
+                        @type = "ListItem",
+                        position = index + 1,
+                        item = new
+                        {
+                                @type = "Restaurant",
+                                name = $"نوید ژلاتو - {branch.Name}",
+                                url = $"https://navidgelato.example/branches#branch-{branch.Id}",
+                                image = storeImageUrl,
+                                telephone = branch.Phones.OrderBy(x => x.SortOrder).FirstOrDefault()?.PhoneNumber,
+                                address = new { @type = "PostalAddress", streetAddress = branch.Address, addressLocality = branch.City, addressCountry = "IR" },
+                                geo = branch.HasCoordinates ? new { @type = "GeoCoordinates", latitude = branch.Latitude, longitude = branch.Longitude } : null
+                        }
+                })
+        }))
+    </script>
+}
+@section Scripts {
+    <script src="~/js/branches.js" asp-append-version="true"></script>
+}

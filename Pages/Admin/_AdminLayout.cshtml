@@ -1,0 +1,74 @@
+@using NavidGelato_Site.Security
+@inject IAdminPermissionService PermissionService
+@{
+    var current = Context.Request.Path.Value?.ToLowerInvariant() ?? string.Empty;
+    var canDashboard = await PermissionService.HasAsync(User, AdminPermissions.Dashboard.View);
+    var canCategories = await PermissionService.HasAsync(User, AdminPermissions.Categories.View);
+    var canProducts = await PermissionService.HasAsync(User, AdminPermissions.Products.View);
+    var canBranches = await PermissionService.HasAsync(User, AdminPermissions.Branches.View);
+    var canSms = await PermissionService.HasAsync(User, AdminPermissions.Sms.View);
+    var canSiteSettings = await PermissionService.HasAsync(User, AdminPermissions.SiteSettings.View);
+    var canPayments = await PermissionService.HasAsync(User, AdminPermissions.Payments.View);
+    var canPaymentReports = await PermissionService.HasAsync(User, AdminPermissions.PaymentReports.View);
+    var canContactErrors = await PermissionService.HasAsync(User, AdminPermissions.ContactErrors.View);
+    var canUsers = await PermissionService.HasAsync(User, AdminPermissions.Users.View);
+}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>@ViewData["Title"] - مدیریت نوید ژلاتو</title>
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/admin-responsive.css" asp-append-version="true" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.slim.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.slim.js"></script>
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    @await RenderSectionAsync("Head", required: false)
+</head>
+<body>
+<div class="admin-sidebar-backdrop" data-admin-sidebar-backdrop></div>
+<div class="admin-shell">
+    <aside class="admin-sidebar" data-admin-sidebar>
+        <div class="admin-sidebar-head">
+            <a class="admin-brand" asp-page="/Admin/Index"><span>NP</span><div><b>نوید ژلاتو</b><small>پنل مدیریت</small></div></a>
+            <button class="admin-sidebar-close" type="button" data-admin-sidebar-close aria-label="بستن منو">×</button>
+        </div>
+        <nav>
+            @if (canDashboard){<a class="@(current == "/admin" || current == "/admin/index" ? "active" : "")" asp-page="/Admin/Index">داشبورد</a>}
+            @if (canCategories){<a class="@(current.Contains("/admin/categories") ? "active" : "")" asp-page="/Admin/Categories">دسته‌بندی‌ها</a>}
+            @if (canProducts){<a class="@(current.Contains("/admin/products") ? "active" : "")" asp-page="/Admin/Products">کالاها و تصاویر</a>}
+            @if (canBranches){<a class="@(current.Contains("/admin/branches") ? "active" : "")" asp-page="/Admin/Branches">شعب</a>}
+            @if (canSms){<a class="@(current.Contains("/admin/smssettings") ? "active" : "")" asp-page="/Admin/SmsSettings">تنظیمات پیامک</a>}
+            @if (canSiteSettings){<a class="@(current.Contains("/admin/sitesettings") ? "active" : "")" asp-page="/Admin/SiteSettings">تنظیمات سایت و اینماد</a>}
+            @if (canPayments){<a class="@(current.Contains("/admin/paymentsettings") ? "active" : "")" asp-page="/Admin/PaymentSettings">تنظیمات درگاه پرداخت</a>}
+            @if (canPaymentReports){<a class="@(current.Contains("/admin/paymentreports") ? "active" : "")" asp-page="/Admin/PaymentReports">گزارش پرداخت‌ها</a>}
+            @if (canContactErrors){<a class="@(current.Contains("/admin/contacterrors") ? "active" : "")" asp-page="/Admin/ContactErrors">خطاهای ارسال</a>}
+            @if (canUsers){<a class="@(current.Contains("/admin/users") ? "active" : "")" asp-page="/Admin/Users">کاربران و دسترسی‌ها</a>}
+            <a class="@(current.Contains("/admin/changepassword") ? "active" : "")" asp-page="/Admin/ChangePassword">تغییر رمز من</a>
+        </nav>
+        <form method="post" asp-page="/Admin/Logout"><button type="submit" class="logout-btn">خروج از حساب</button></form>
+    </aside>
+    <main class="admin-main">
+        <header class="admin-topbar">
+            <div class="admin-topbar-user">
+                <button class="admin-mobile-menu" type="button" data-admin-sidebar-toggle aria-expanded="false" aria-label="باز کردن منوی مدیریت"><span></span><span></span><span></span></button>
+                <div><span>مدیریت Navid Pro</span><b>@User.Identity?.Name</b></div>
+            </div>
+            <a href="/" target="_blank">مشاهده سایت ↗</a>
+        </header>
+        <section class="admin-content">
+            @if (TempData["Success"] is string success){<span hidden data-toast-kind="success" data-toast-message="@success"></span>}
+            @if (TempData["Error"] is string error){<span hidden data-toast-kind="error" data-toast-message="@error"></span>}
+            @RenderBody()
+        </section>
+    </main>
+</div>
+<script src="~/js/admin-toasts.js" asp-append-version="true"></script>
+<script src="~/js/admin-ui.js" asp-append-version="true"></script>
+<script src="~/js/admin-table-search.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

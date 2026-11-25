@@ -1,0 +1,80 @@
+@page
+@model NavidGelato_Site.Pages.ContactModel
+@{
+    ViewData["Title"] = "ارتباط با نوید ژلاتو | ارسال درخواست و پیشنهاد";
+    ViewData["Description"] = "برای ارسال پیشنهاد، انتقاد، درخواست همکاری یا پیام به نوید ژلاتو فرم ارتباط را تکمیل کنید. شماره تماس اختیاری است.";
+    ViewData["Canonical"] = "https://navidgelato.example/contact";
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+{
+    <span hidden data-public-toast-kind="success" data-public-toast-message="@Model.SuccessMessage"></span>
+}
+@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+{
+    <span hidden data-public-toast-kind="error" data-public-toast-message="@Model.ErrorMessage"></span>
+}
+
+<div class="public-motion-page contact-page">
+    <section class="page-hero contact-page-hero">
+        <div class="container contact-hero-grid">
+            <div data-motion-reveal>
+                <span class="eyebrow"><i></i> TALK TO NAVID GELATO</span>
+                <h1>حرفت رو<br /><span>مستقیم به ما بگو.</span></h1>
+                <p>پیشنهاد، انتقاد، تجربه از یک شعبه، درخواست همکاری یا حتی یک سوال ساده. پیام باید مستقیم و راحت به دست تیم برسه، نه اینکه در هزارتوی فرم‌های اداری پیر بشه.</p>
+                <div class="contact-hero-topics"><span>پیشنهاد و انتقاد</span><span>تجربه شعبه</span><span>همکاری</span><span>سوال درباره برند</span></div>
+            </div>
+            <div class="contact-signal" aria-hidden="true">
+                <span class="contact-signal-ring r1"></span><span class="contact-signal-ring r2"></span><span class="contact-signal-ring r3"></span>
+                <div class="contact-signal-core"><svg viewBox="0 0 32 32"><path d="M5 7.5h22v15H13l-5.5 4v-4H5z"/><path d="M10 12h12M10 16h8"/></svg></div>
+                <i class="contact-signal-dot d1"></i><i class="contact-signal-dot d2"></i><i class="contact-signal-dot d3"></i>
+            </div>
+        </div>
+    </section>
+
+    <section class="section contact-section">
+        <div class="container contact-grid">
+            <div class="contact-info" data-motion-reveal>
+                <span class="section-kicker">راه‌های ارتباطی</span>
+                <h2>برای هر چیزی که ارزش گفتن دارد.</h2>
+                <p>اگر موضوعت کوتاهه، تماس مستقیم سریع‌تره. اگر نیاز به توضیح داره، فرم روبه‌رو برای همین ساخته شده.</p>
+                <div class="contact-detail"><span>تلفن مرکزی</span><a href="tel:02632527272" dir="ltr">026 3252 7272</a></div>
+                <div class="contact-detail"><span>ایمیل</span><a href="mailto:khodadoostnavid@gmail.com">khodadoostnavid@gmail.com</a></div>
+                <div class="contact-detail"><span>ساعات کاری</span><b>همه‌روزه ۱۰ صبح تا ۱۲ شب</b></div>
+            </div>
+            <div class="contact-form-card" data-motion-card>
+                <form method="post" class="contact-form">
+                    <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+                    <label>
+                        <span>نام و نام خانوادگی *</span>
+                        <input asp-for="Input.Name" placeholder="مثلاً امیر فروتن" autocomplete="name" />
+                        <span asp-validation-for="Input.Name" class="field-validation"></span>
+                    </label>
+                    <label>
+                        <span>شماره تماس <small>(اختیاری)</small></span>
+                        <input asp-for="Input.Mobile" placeholder="09xxxxxxxxx" inputmode="tel" autocomplete="tel" dir="ltr" />
+                        <span asp-validation-for="Input.Mobile" class="field-validation"></span>
+                    </label>
+                    <label>
+                        <span>شرح درخواست *</span>
+                        <textarea asp-for="Input.Message" rows="6" placeholder="هر چیزی که لازم است بدانیم..." maxlength="1200"></textarea>
+                        <span asp-validation-for="Input.Message" class="field-validation"></span>
+                    </label>
+                    <button class="btn btn-primary form-submit" type="submit">ارسال برای نوید ژلاتو <span>←</span></button>
+                    <p class="form-hint">با ارسال فرم، متن درخواست از طریق سرویس پیامکی سایت برای تیم نوید ژلاتو ارسال می‌شود.</p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact-process">
+        <div class="container">
+            <div class="contact-process-head" data-motion-reveal><div><span class="section-kicker light">بعد از ارسال چه می‌شود؟</span><h2>پیامت مستقیم می‌ره سر اصل مطلب.</h2></div><p>فرم کوتاه نگه داشته شده چون برای ارتباط گرفتن نباید رزومه سه‌صفحه‌ای پر کنی. اسم، موضوع و اگر خواستی شماره تماس کافی است.</p></div>
+            <div class="contact-process-grid">
+                <article class="contact-process-card" data-step="01" data-motion-card><span>01 / WRITE</span><h3>موضوعت رو بنویس</h3><p>هرچقدر لازم است توضیح بده. متن تا ۱۲۰۰ کاراکتر جا دارد.</p></article>
+                <article class="contact-process-card" data-step="02" data-motion-card style="--motion-delay:90ms"><span>02 / SEND</span><h3>مستقیم ارسال کن</h3><p>پیام از مسیر سرویس سایت برای تیم نوید ژلاتو ارسال می‌شود.</p></article>
+                <article class="contact-process-card" data-step="03" data-motion-card style="--motion-delay:180ms"><span>03 / CONNECT</span><h3>اگر نیاز بود باهات تماس می‌گیریم</h3><p>شماره تماس اختیاری است؛ برای موضوعاتی که پاسخ مستقیم لازم دارند واردش کن.</p></article>
+            </div>
+        </div>
+    </section>
+</div>

@@ -1,0 +1,36 @@
+@page
+@model NavidGelato_Site.Pages.Admin.SiteSettingsModel
+@using NavidGelato_Site.Security
+@inject IAdminPermissionService PermissionService
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "تنظیمات سایت";
+    var canEdit = await PermissionService.HasAsync(User, AdminPermissions.SiteSettings.Edit);
+}
+
+<div class="admin-page-head">
+    <div><span>نمای عمومی سایت</span><h1>تنظیمات سایت و اینماد</h1></div>
+</div>
+
+<div class="admin-panel narrow-panel site-settings-panel">
+    <div class="settings-section-head">
+        <div><span class="settings-icon">✓</span><div><h2>نماد اعتماد الکترونیکی</h2><p>لینک صفحه اینماد یا کد رسمی دریافتی از اینماد را اینجا قرار دهید.</p></div></div>
+    </div>
+
+    @if (canEdit)
+    {
+        <form method="post" asp-page-handler="Save" class="admin-form">
+            <label>
+                لینک یا کد رسمی اینماد
+                <textarea asp-for="Form.EnamadHtml" rows="7" dir="ltr" spellcheck="false" placeholder="مثلاً https://trustseal.enamad.ir/... یا کد رسمی <a><img ...></a>"></textarea>
+                <small>اگر URL وارد کنید، سایت آن را به‌صورت Badge قابل کلیک نمایش می‌دهد. اگر کد رسمی HTML اینماد را وارد کنید، همان Badge رسمی رندر می‌شود. مقدار خالی یعنی هیچ چیزی در فوتر نمایش داده نشود.</small>
+            </label>
+            <div asp-validation-summary="All" class="validation-summary"></div>
+            <button class="admin-primary" type="submit">ذخیره تنظیمات سایت</button>
+        </form>
+    }
+    else
+    {
+        <div class="code-preview"><span>مقدار فعلی</span><pre dir="ltr">@(string.IsNullOrWhiteSpace(Model.Form.EnamadHtml) ? "هنوز لینکی ثبت نشده است." : Model.Form.EnamadHtml)</pre></div>
+    }
+</div>

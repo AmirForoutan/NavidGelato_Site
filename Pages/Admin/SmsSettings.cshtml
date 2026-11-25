@@ -1,0 +1,140 @@
+@page
+@model NavidGelato_Site.Pages.Admin.SmsSettingsModel
+@using NavidGelato_Site.Security
+@inject IAdminPermissionService PermissionService
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "تنظیمات پیامک";
+    var canEdit = await PermissionService.HasAsync(User, AdminPermissions.Sms.Edit);
+}
+
+<div class="admin-page-head">
+    <div>
+        <span>ارتباطات</span>
+        <h1>تنظیمات پنل پیامکی</h1>
+    </div>
+</div>
+
+@if (canEdit)
+{
+    <form method="post" asp-page-handler="Save" class="admin-two-col settings-layout">
+        <div class="admin-panel">
+            <h2>ملی پیامک</h2>
+            <div class="admin-form">
+                <label class="switch-label">
+                    <input asp-for="Form.Enabled" type="checkbox" />
+                    فعال بودن ارسال پیامک
+                </label>
+
+                <label>
+                    نام کاربری
+                    <input asp-for="Form.Username" dir="ltr" autocomplete="off" />
+                </label>
+
+                <label>
+                    رمز عبور
+                    <input asp-for="Form.Password"
+                           type="password"
+                           dir="ltr"
+                           autocomplete="new-password"
+                           placeholder="@(Model.HasSavedPassword ? "برای حفظ رمز فعلی خالی بگذارید" : "رمز عبور ملی پیامک")" />
+                    <small>
+                        @(Model.HasSavedPassword
+                            ? "رمز قبلی رمزنگاری شده و با خالی گذاشتن تغییر نمی‌کند."
+                            : "رمز به صورت رمزنگاری‌شده ذخیره می‌شود.")
+                    </small>
+                </label>
+
+                <label>
+                    شماره خط ارسال‌کننده
+                    <input asp-for="Form.From" dir="ltr" />
+                </label>
+
+                <label>
+                    شماره‌های دریافت‌کننده پیام‌های مدیریتی
+                    <textarea asp-for="Form.RecipientNumbers" rows="7" dir="ltr"></textarea>
+                    <small>این شماره‌ها برای اعلان‌های مدیریتی سایت هستند و ارتباطی با شماره مشتری لینک پرداخت ندارند.</small>
+                </label>
+
+                <div class="settings-section-head">
+                    <div>
+                        <span class="settings-icon">***</span>
+                        <div>
+                            <h2>فیلتر کلمات نامناسب</h2>
+                            <p>روی متن پیام‌های «ارتباط با نوید ژلاتو» و «درخواست فرانچایز» قبل از ارسال پیامک اعمال می‌شود.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <label class="switch-label">
+                    <input asp-for="Form.MessageFilterEnabled" type="checkbox" />
+                    فیلتر خودکار کلمات نامناسب فعال باشد
+                </label>
+
+                <label>
+                    کلمات و عبارت‌های فیلترشونده
+                    <textarea asp-for="Form.MessageFilterTerms" rows="10"></textarea>
+                    <small>هر کلمه یا عبارت را در یک خط بنویسید. جدا کردن با ویرگول یا «؛» هم پشتیبانی می‌شود.</small>
+                    <small>سیستم حروف عربی/فارسی، کشیده، نیم‌فاصله، فاصله و بعضی جداکننده‌های رایج بین حروف را نرمال می‌کند و مورد تشخیص‌داده‌شده را با <code dir="ltr">***</code> جایگزین می‌کند.</small>
+                </label>
+            </div>
+        </div>
+
+        <div class="admin-panel">
+            <h2>متن پیامک لینک پرداخت مشتری</h2>
+            <div class="admin-form">
+                <label>
+                    قالب پیامک
+                    <textarea asp-for="Form.PaymentLinkTemplate" rows="11"></textarea>
+                    <small>
+                        متغیرهای قابل استفاده:
+                        <code dir="ltr">{amount}</code>
+                        مبلغ به ریال،
+                        <code dir="ltr">{link}</code>
+                        لینک کوتاه پرداخت،
+                        <code dir="ltr">{mobile}</code>
+                        شماره موبایل مشتری.
+                    </small>
+                    <small>وجود <code dir="ltr">{link}</code> در قالب الزامی است.</small>
+                </label>
+
+                <div class="code-preview">
+                    <span>نمونه قالب</span>
+                    <pre>نوید ژلاتو
+لینک پرداخت {amount} ریال:
+{link}
+مهلت پرداخت: ۱۵ دقیقه پس از اولین باز شدن لینک</pre>
+                </div>
+
+                <div asp-validation-summary="All" class="validation-summary"></div>
+                <button class="admin-primary" type="submit">ذخیره تنظیمات پیامک</button>
+            </div>
+        </div>
+    </form>
+}
+else
+{
+    <div class="admin-two-col settings-layout">
+        <div class="admin-panel">
+            <h2>ملی پیامک</h2>
+            <div class="settings-readonly">
+                <p>نام کاربری: <b dir="ltr">@Model.Form.Username</b></p>
+                <p>خط ارسال: <b dir="ltr">@Model.Form.From</b></p>
+                <p>وضعیت: <b>@(Model.Form.Enabled ? "فعال" : "غیرفعال")</b></p>
+                <p>فیلتر کلمات نامناسب: <b>@(Model.Form.MessageFilterEnabled ? "فعال" : "غیرفعال")</b></p>
+            </div>
+            <div class="code-preview">
+                <span>کلمات و عبارت‌های فیلترشونده</span>
+                <pre>@Model.Form.MessageFilterTerms</pre>
+            </div>
+        </div>
+
+        <div class="admin-panel">
+            <h2>متن پیامک لینک پرداخت مشتری</h2>
+            <div class="code-preview">
+                <span>قالب فعلی</span>
+                <pre>@Model.Form.PaymentLinkTemplate</pre>
+            </div>
+        </div>
+    </div>
+}
