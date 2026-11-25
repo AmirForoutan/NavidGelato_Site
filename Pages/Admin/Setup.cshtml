@@ -1,0 +1,34 @@
+@page
+@model NavidGelato_Site.Pages.Admin.SetupModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>راه‌اندازی مدیریت نوید ژلاتو</title>
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+</head>
+<body class="admin-login-body">
+    <main class="login-card">
+        <div class="login-brand"><span>NG</span><div><b>Navid Gelato</b><small>راه‌اندازی اولیه</small></div></div>
+        <h1>ایجاد حساب مدیر اصلی</h1>
+        <p>این صفحه فقط هنگام اجرای محلی در حالت Development و پیش از ایجاد اولین مدیر در دسترس است.</p>
+        <form method="post">
+            <div asp-validation-summary="All" class="validation-summary"></div>
+            <label>رمز عبور مدیر
+                <input asp-for="Input.Password" type="password" autocomplete="new-password" minlength="8" />
+            </label>
+            <label>تکرار رمز عبور
+                <input asp-for="Input.ConfirmPassword" type="password" autocomplete="new-password" minlength="8" />
+            </label>
+            <p>حداقل ۸ کاراکتر شامل حروف بزرگ و کوچک انگلیسی، عدد و نماد (مثلاً ! یا #).</p>
+            <button class="admin-primary" type="submit">ساخت حساب مدیر</button>
+        </form>
+        <a class="back-link" asp-page="/Index">بازگشت به سایت</a>
+    </main>
+</body>
+</html>

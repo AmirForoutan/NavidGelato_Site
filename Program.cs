@@ -59,6 +59,7 @@ builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/Admin");
     options.Conventions.AllowAnonymousToPage("/Admin/Login");
+    options.Conventions.AllowAnonymousToPage("/Admin/Setup");
     options.Conventions.AllowAnonymousToPage("/Admin/AccessDenied");
 });
 
