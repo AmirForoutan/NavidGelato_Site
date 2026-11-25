@@ -1,0 +1,242 @@
+@page
+@model NavidGelato_Site.Pages.Admin.BranchesModel
+@using NavidGelato_Site.Models
+@using NavidGelato_Site.Security
+@inject IAdminPermissionService PermissionService
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "شعب";
+    var canCreate = await PermissionService.HasAsync(User, AdminPermissions.Branches.Create);
+    var canEdit = await PermissionService.HasAsync(User, AdminPermissions.Branches.Edit);
+    var canDelete = await PermissionService.HasAsync(User, AdminPermissions.Branches.Delete);
+    var canSave = Model.Form.Id == 0 ? canCreate : canEdit;
+    var editorOpen = Model.Request.Query.ContainsKey("editId") || !ViewData.ModelState.IsValid;
+    var selectedCategories = Model.Form.CategoryIds.ToHashSet();
+    var selectedProducts = Model.Form.ProductIds.ToHashSet();
+    var closeUrl = Url.Page("/Admin/Branches") ?? string.Empty;
+}
+<div class="admin-page-head">
+    <div><span>موقعیت‌ها</span><h1>مدیریت شعب</h1></div>
+    @if (canCreate)
+    {
+        <a class="admin-primary link-btn" asp-page="/Admin/Branches" asp-route-editId="0">شعبه جدید</a>
+    }
+</div>
+
+<div class="admin-modal-list-layout">
+    <div class="admin-panel admin-list-panel">
+        <h2>لیست شعب</h2>
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead><tr><th>شعبه</th><th>شهر</th><th>شبا تسویه</th><th>کلید API</th><th>وضعیت</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td><b>@item.Name</b></td>
+                        <td>@item.City</td>
+                        <td dir="ltr">@(string.IsNullOrWhiteSpace(item.Iban) ? "—" : item.Iban)</td>
+                        <td><span class="branch-key-state @(string.IsNullOrWhiteSpace(item.SecurityKey) ? "off" : "on")">@(string.IsNullOrWhiteSpace(item.SecurityKey) ? "تعریف نشده" : "فعال")</span></td>
+                        <td><span class="status @(item.IsActive ? "on" : "off")">@(item.IsActive ? "نمایش" : "مخفی")</span></td>
+                        <td class="table-actions">
+                            @if (canEdit)
+                            {
+                                <a asp-page="/Admin/Branches" asp-route-editId="@item.Id">ویرایش</a>
+                            }
+                            @if (canDelete)
+                            {
+                                <form method="post" asp-page-handler="Delete" onsubmit="return confirm('این شعبه حذف شود؟')">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <button class="text-danger" type="submit">حذف</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="admin-panel admin-editor-panel admin-editor-wide branch-editor-scroll @(editorOpen ? "is-open" : "")"
+         data-admin-editor-modal
+         data-admin-editor-close-url="@closeUrl">
+        <div class="admin-editor-head">
+            <div>
+                <h2>@(Model.Form.Id == 0 ? "شعبه جدید" : "ویرایش شعبه")</h2>
+                <p>اطلاعات شعبه، کلید API و دسترسی دسته‌بندی/کالاها را یک‌جا مدیریت کنید.</p>
+            </div>
+            <a class="admin-editor-close" asp-page="/Admin/Branches">×</a>
+        </div>
+
+        @if (canSave)
+        {
+            <form method="post" asp-page-handler="Save" class="admin-form">
+                <input type="hidden" asp-for="Form.Id" />
+
+                <div class="form-row">
+                    <label>نام شعبه<input asp-for="Form.Name" /></label>
+                    <label>شهر<input asp-for="Form.City" /></label>
+                    <label>ترتیب<input asp-for="Form.SortOrder" type="number" /></label>
+                </div>
+
+                <label>آدرس<textarea asp-for="Form.Address" rows="3"></textarea></label>
+
+                <div class="branch-security-box">
+                    <div class="branch-security-head">
+                        <div>
+                            <b>کلید امنیتی API شعبه</b>
+                            <span>خالی باشد، این شعبه به API کاتالوگ دسترسی ندارد.</span>
+                        </div>
+                        <button type="button" data-generate-security-key>تولید کلید</button>
+                    </div>
+                    <div class="branch-security-input">
+                        <input id="Form_SecurityKey"
+       name="Form.SecurityKey"
+       value="@Model.Form.SecurityKey"
+       type="password"
+       dir="ltr"
+       autocomplete="off"
+       maxlength="128"
+       data-security-key
+       placeholder="مثلاً 32 کاراکتر تصادفی" />
+                        <button type="button" data-toggle-security-key>نمایش</button>
+                    </div>
+                </div>
+
+                <label>
+                    شماره شبا تسویه شعبه
+                    <input asp-for="Form.Iban" dir="ltr" maxlength="26" autocomplete="off" placeholder="IRxxxxxxxxxxxxxxxxxxxxxxxx" />
+                    <small>مبلغ لینک‌های پرداخت این شعبه در SettlementIbanInfo به همین شبا تخصیص داده می‌شود.</small>
+                </label>
+
+                <label>وضعیت شعبه
+                    <select asp-for="Form.Status" data-branch-status>
+                        <option value="0">دایر و فعال</option>
+                        <option value="1">در حال راه‌اندازی</option>
+                        <option value="2">در حال افتتاحیه</option>
+                    </select>
+                </label>
+
+                @if (Model.Form.Status == BranchStatus.OpeningSoon)
+                {
+                    <div class="opening-date-field" data-opening-fields>
+                        <label>تاریخ و ساعت افتتاح (شمسی)<input asp-for="Form.OpeningDateTimeText" data-jdp dir="ltr" autocomplete="off" placeholder="مثلاً 1405/07/20 18:30" /></label>
+                    </div>
+                }
+                else
+                {
+                    <div class="opening-date-field" data-opening-fields hidden>
+                        <label>تاریخ و ساعت افتتاح (شمسی)<input asp-for="Form.OpeningDateTimeText" data-jdp dir="ltr" autocomplete="off" placeholder="مثلاً 1405/07/20 18:30" /></label>
+                    </div>
+                }
+
+                <label>شماره تماس‌ها<textarea asp-for="Form.PhoneNumbers" rows="3" dir="ltr"></textarea></label>
+
+                <div class="form-row">
+                    <label>Latitude<input asp-for="Form.Latitude" dir="ltr" /></label>
+                    <label>Longitude<input asp-for="Form.Longitude" dir="ltr" /></label>
+                    <label class="switch-label"><input asp-for="Form.IsCentral" type="checkbox" /> مرکزی</label>
+                </div>
+
+                <label>لینک نشان<input asp-for="Form.NeshanUrl" dir="ltr" /></label>
+                <label>لینک بلد<input asp-for="Form.BaladUrl" dir="ltr" /></label>
+
+                <div class="form-row">
+                    <label>لینک Waze<input asp-for="Form.WazeUrl" dir="ltr" /></label>
+                    <label>لینک Google Maps<input asp-for="Form.GoogleMapsUrl" dir="ltr" /></label>
+                    <label class="switch-label"><input asp-for="Form.IsActive" type="checkbox" /> نمایش در سایت</label>
+                </div>
+
+                <section class="branch-catalog-section">
+                    <div class="branch-catalog-head">
+                        <div>
+                            <span>BRANCH CATALOG</span>
+                            <h3>دسته‌بندی‌ها و کالاهای این شعبه</h3>
+                            <p>با انتخاب یک دسته‌بندی، همه کالاهای آن به‌صورت پیش‌فرض انتخاب می‌شوند. بعد می‌توانی هر کالایی را جداگانه برداری.</p>
+                        </div>
+                        <div class="branch-catalog-tools">
+                            <button type="button" data-catalog-select-all>انتخاب همه</button>
+                            <button type="button" data-catalog-clear>پاک کردن همه</button>
+                        </div>
+                    </div>
+
+                    <div class="branch-catalog-tree" data-branch-catalog-tree>
+                        @foreach (var category in Model.CatalogTree)
+                        {
+                            <article class="branch-tree-category" data-category-node>
+                                <div class="branch-tree-category-head">
+                                    <label>
+                                        <input type="checkbox"
+                                               name="Form.CategoryIds"
+                                               value="@category.Id"
+                                               data-category-check
+                                               checked="@selectedCategories.Contains(category.Id)" />
+                                        <span class="branch-tree-toggle" aria-hidden="true">⌄</span>
+                                        <strong>@category.Title</strong>
+                                        <small>@category.Products.Count کالا</small>
+                                        @if (!category.IsActive)
+                                        {
+                                            <em>غیرفعال</em>
+                                        }
+                                    </label>
+                                    <button type="button" data-category-collapse>باز/بسته</button>
+                                </div>
+
+                                <div class="branch-tree-products">
+                                    @if (category.Products.Count == 0)
+                                    {
+                                        <p class="branch-tree-empty">کالایی در این دسته ثبت نشده است.</p>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var product in category.Products)
+                                        {
+                                            <label class="branch-tree-product">
+                                                <input type="checkbox"
+                                                       name="Form.ProductIds"
+                                                       value="@product.Id"
+                                                       data-product-check
+                                                       checked="@selectedProducts.Contains(product.Id)" />
+                                                <span class="branch-tree-checkmark"></span>
+                                                <span class="branch-tree-product-name">@product.Name</span>
+                                                <span class="branch-tree-product-code">@(product.ProductCode?.ToString() ?? "بدون کد")</span>
+                                                @if (!product.IsActive)
+                                                {
+                                                    <em>غیرفعال</em>
+                                                }
+                                            </label>
+                                        }
+                                    }
+                                </div>
+                            </article>
+                        }
+                    </div>
+                </section>
+
+                <div asp-validation-summary="All" class="validation-summary"></div>
+                <button class="admin-primary branch-save-sticky" type="submit">ذخیره شعبه و ارتباط‌ها</button>
+            </form>
+        }
+    </div>
+</div>
+
+@section Head {
+    <link rel="stylesheet" href="https://unpkg.com/@@majidh1/jalalidatepicker/dist/jalalidatepicker.min.css" />
+    <link rel="stylesheet" href="~/css/admin-branches.css" asp-append-version="true" />
+}
+
+@section Scripts {
+<script src="https://unpkg.com/@@majidh1/jalalidatepicker/dist/jalalidatepicker.min.js"></script>
+<script>
+(() => {
+    const status = document.querySelector('[data-branch-status]');
+    const fields = document.querySelector('[data-opening-fields]');
+    const toggle = () => { if (status && fields) fields.hidden = status.value !== '@((int)BranchStatus.OpeningSoon)'; };
+    status?.addEventListener('change', toggle);
+    toggle();
+    if (window.jalaliDatepicker) jalaliDatepicker.startWatch({selector:'input[data-jdp]',date:true,time:true,hasSecond:false,minDate:'today',persianDigits:false,showTodayBtn:true,showEmptyBtn:true,showCloseBtn:true,hideAfterChangeWithTime:false,zIndex:4000});
+})();
+</script>
+<script src="~/js/admin-branches.js" asp-append-version="true"></script>
+}

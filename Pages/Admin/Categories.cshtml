@@ -1,0 +1,20 @@
+@page
+@model NavidGelato_Site.Pages.Admin.CategoriesModel
+@using NavidGelato_Site.Security
+@inject IAdminPermissionService PermissionService
+@{
+    Layout="_AdminLayout";
+    ViewData["Title"]="دسته‌بندی‌ها";
+    var canCreate=await PermissionService.HasAsync(User,AdminPermissions.Categories.Create);
+    var canEdit=await PermissionService.HasAsync(User,AdminPermissions.Categories.Edit);
+    var canSave=Model.Form.Id==0?canCreate:canEdit;
+    var editorOpen=Model.Request.Query.ContainsKey("editId") || !ViewData.ModelState.IsValid;
+}
+<div class="admin-page-head"><div><span>منوی دیجیتال</span><h1>مدیریت دسته‌بندی‌ها</h1></div>@if(canCreate){<a class="admin-primary link-btn" asp-page="/Admin/Categories" asp-route-editId="0">دسته‌بندی جدید</a>}</div>
+<div class="admin-modal-list-layout">
+    <div class="admin-panel admin-list-panel"><h2>لیست دسته‌بندی‌ها</h2><div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>کد گروه</th><th>عنوان</th><th>Slug</th><th>ترتیب</th><th>وضعیت</th><th></th></tr></thead><tbody>@foreach(var item in Model.Items){<tr><td dir="ltr"><b>@item.GroupCode</b></td><td>@item.Title</td><td dir="ltr">@item.Slug</td><td>@item.SortOrder</td><td><span class="status @(item.IsActive?"on":"off")">@(item.IsActive?"فعال":"غیرفعال")</span></td><td>@if(canEdit){<a asp-page="/Admin/Categories" asp-route-editId="@item.Id">ویرایش</a>}</td></tr>}</tbody></table></div></div>
+    <div class="admin-panel admin-editor-panel @(editorOpen ? "is-open" : "")" data-admin-editor-modal data-admin-editor-close-url="/Admin/Categories">
+        <div class="admin-editor-head"><div><h2>@(Model.Form.Id==0?"دسته‌بندی جدید":"ویرایش دسته‌بندی")</h2><p>کد گروه، عنوان، شناسه و ترتیب نمایش دسته را تنظیم کنید.</p></div><a class="admin-editor-close" asp-page="/Admin/Categories">×</a></div>
+        @if(canSave){<form method="post" asp-page-handler="Save" class="admin-form"><input type="hidden" asp-for="Form.Id"/><div class="form-row"><label>کد گروه<input asp-for="Form.GroupCode" type="number" min="1" dir="ltr" required/></label><label>عنوان<input asp-for="Form.Title"/></label></div><label>شناسه انگلیسی (Slug)<input asp-for="Form.Slug" dir="ltr"/></label><label>توضیح کوتاه<textarea asp-for="Form.Subtitle" rows="3"></textarea></label><div class="form-row"><label>ترتیب<input asp-for="Form.SortOrder" type="number"/></label><label class="switch-label"><input asp-for="Form.IsActive" type="checkbox"/> فعال باشد</label></div><div asp-validation-summary="All" class="validation-summary"></div><button class="admin-primary" type="submit">ذخیره دسته‌بندی</button></form>}else{<p class="muted-text">دسترسی ایجاد یا ویرایش دسته‌بندی برای شما فعال نیست.</p>}
+    </div>
+</div>
