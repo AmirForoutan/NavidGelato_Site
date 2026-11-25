@@ -1,0 +1,167 @@
+@page
+@model MenuModel
+@using NavidGelato_Site.Services
+@{
+    ViewData["Title"] = "منوی دیجیتال نوید ژلاتو | ساندویچ سرد، گرم و نوشیدنی";
+    ViewData["Description"] = "منوی دیجیتال نوید ژلاتو همراه دسته‌بندی ساندویچ‌های سرد، گرم، محصولات پرو و نوشیدنی‌ها با قیمت و تصویر.";
+    ViewData["Canonical"] = "https://navidgelato.example/menu";
+    ViewData["OgImage"] = SiteContentService.ArcherImage;
+    var fallbackImage = Url.Content(SiteContentService.LogoImage);
+}
+<div class="public-motion-page menu-page">
+    <section class="page-hero menu-page-hero">
+        <div class="container menu-hero-grid">
+            <div class="menu-page-hero-copy" data-motion-reveal>
+                <span class="eyebrow"><i></i> NAVID GELATO DIGITAL MENU</span>
+                <h1>منوی دیجیتال<br /><span>شخصیت مورد علاقه‌ت رو پیدا کن.</span></h1>
+                <p class="menu-hero-lead">از آرچر و والکری تا ترکیب‌های PRO؛ دسته‌بندی رو انتخاب کن، عکس‌ها رو ببین و چیزی رو پیدا کن که امروز بیشتر شبیه حال و هواته.</p>
+                <div class="menu-hero-pills"><span>ساندویچ سرد</span><span>ساندویچ گرم</span><span>PRO SERIES</span><span>نوشیدنی</span></div>
+            </div>
+            <div class="menu-hero-product" aria-hidden="true">
+                <span class="menu-hero-product-ring"></span>
+                <img src="@Url.Content(SiteContentService.ArcherImage)" alt="" />
+                <span class="menu-hero-product-mark">NP</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="menu-experience-strip" aria-label="راهنمای منوی دیجیتال">
+        <div class="container">
+            <div class="menu-experience-item" data-motion-reveal style="--motion-delay:0ms"><b>01</b><div><strong>دسته‌بندی رو انتخاب کن</strong><span>سریع بین سرد، گرم و بقیه منو حرکت کن.</span></div></div>
+            <div class="menu-experience-item" data-motion-reveal style="--motion-delay:100ms"><b>02</b><div><strong>تصاویر رو باز کن</strong><span>محصولاتی که گالری دارن رو از نزدیک ببین.</span></div></div>
+            <div class="menu-experience-item" data-motion-reveal style="--motion-delay:200ms"><b>03</b><div><strong>شخصیتت رو پیدا کن</strong><span>اسم، ترکیب و قیمت کنار هم؛ بدون دردسر.</span></div></div>
+        </div>
+    </section>
+
+    @if (Model.Categories.Count == 0)
+    {
+        <section class="menu-content">
+            <div class="container"><div class="empty-state">هنوز آیتمی برای منو ثبت نشده است.</div></div>
+        </section>
+    }
+    else
+    {
+        <nav class="menu-category-nav" data-menu-nav aria-label="دسته‌بندی منو">
+            <div class="container category-scroll" data-category-scroll>
+                @for (var i = 0; i < Model.Categories.Count; i++)
+                {
+                    var category = Model.Categories[i];
+                    <a href="#@category.Slug" data-category-link="@category.Slug" class="@(i == 0 ? "active" : "")">
+                        <span>@((i + 1).ToString("00"))</span>
+                        @category.Title
+                    </a>
+                }
+            </div>
+        </nav>
+
+        <section class="menu-content">
+            <div class="container">
+                @foreach (var category in Model.Categories)
+                {
+                    var itemIndex = 0;
+                    <section class="menu-section" id="@category.Slug" data-menu-section="@category.Slug" data-section-label="@category.Title">
+                        <div class="menu-section-head" data-motion-reveal>
+                            <div>
+                                <span class="section-kicker">@category.Title</span>
+                                <h2>@category.Title</h2>
+                                @if (!string.IsNullOrWhiteSpace(category.Subtitle))
+                                {
+                                    <p>@category.Subtitle</p>
+                                }
+                            </div>
+                            <span class="item-count">@category.Items.Count آیتم</span>
+                        </div>
+
+                        <div class="menu-grid">
+                            @foreach (var item in category.Items)
+                            {
+                                var images = item.Images.OrderByDescending(x => x.IsPrimary).ThenBy(x => x.SortOrder).ToList();
+                                var image = images.FirstOrDefault()?.FilePath ?? fallbackImage;
+                                var alt = images.FirstOrDefault()?.AltText ?? $"{item.Name} نوید ژلاتو";
+                                var galleryId = $"menu-product-{item.Id}";
+                                var delay = (itemIndex % 6) * 70;
+                                itemIndex++;
+                                <article class="menu-card @(item.IsFeatured ? "featured" : "")" data-motion-card style="--motion-delay:@(delay)ms">
+                                    @if (images.Count > 0)
+                                    {
+                                        <button type="button"
+                                                class="menu-card-image product-gallery-trigger"
+                                                data-product-gallery-open="@galleryId"
+                                                data-product-gallery-index="0"
+                                                data-product-gallery-title="@item.Name"
+                                                aria-label="مشاهده تصاویر @item.Name">
+                                            <img src="@image" alt="@alt" loading="lazy" onerror="this.onerror=null;this.src='@fallbackImage';this.parentElement.classList.add('menu-card-image-fallback')" />
+                                            @if (item.IsFeatured)
+                                            {
+                                                <span>پیشنهادی</span>
+                                            }
+                                            @if (images.Count > 1)
+                                            {
+                                                <b class="menu-gallery-count">@images.Count تصویر</b>
+                                            }
+                                            <i class="menu-gallery-zoom" aria-hidden="true">⌕</i>
+                                        </button>
+                                        <div hidden data-product-gallery-items="@galleryId">
+                                            @foreach (var galleryImage in images)
+                                            {
+                                                <span data-product-gallery-src="@galleryImage.FilePath" data-product-gallery-alt="@(galleryImage.AltText ?? item.Name)"></span>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="menu-card-image menu-card-image-fallback">
+                                            <img src="@fallbackImage" alt="لوگوی نوید ژلاتو - @item.Name" loading="lazy" />
+                                            @if (item.IsFeatured)
+                                            {
+                                                <span>پیشنهادی</span>
+                                            }
+                                        </div>
+                                    }
+
+                                    <div class="menu-card-body">
+                                        <div class="menu-title-row">
+                                            <h3>@item.Name</h3>
+                                            <strong>@item.PriceText <small>تومان</small></strong>
+                                        </div>
+                                        @if (!string.IsNullOrWhiteSpace(item.Description))
+                                        {
+                                            <p>@item.Description</p>
+                                        }
+                                        <span class="menu-tag">@category.Title</span>
+                                    </div>
+                                </article>
+                            }
+                        </div>
+                    </section>
+                }
+            </div>
+        </section>
+    }
+</div>
+
+@section Head {
+    <link rel="stylesheet" href="~/css/product-gallery.css" asp-append-version="true" />
+    <style>
+        /* The opening announcement shifts the fixed site header down. Keep the sticky
+           menu categories below both layers instead of letting them slide underneath. */
+        body.has-opening-announcement .menu-page .menu-category-nav {
+            top: 146px;
+        }
+        body.has-opening-announcement .menu-page .menu-section {
+            scroll-margin-top: 233px;
+        }
+        @@media (max-width: 760px) {
+            body.has-opening-announcement .menu-page .menu-category-nav {
+                top: 150px;
+            }
+            body.has-opening-announcement .menu-page .menu-section {
+                scroll-margin-top: 221px;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="~/js/product-gallery.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,186 @@
+@page
+@model FranchiseModel
+@using NavidGelato_Site.Services
+@{
+    ViewData["Title"] = "درخواست فرانچایز نوید ژلاتو | همکاری و راه‌اندازی شعبه";
+    ViewData["Description"] = "برای دریافت فرانچایز نوید ژلاتو، شرایط همکاری را بررسی کنید و از طریق تماس مستقیم یا فرم آنلاین درخواست خود را ثبت کنید.";
+    ViewData["Canonical"] = "https://navidgelato.example/franchise";
+    ViewData["OgImage"] = SiteContentService.BrandBannerImage;
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+{
+    <span hidden data-public-toast-kind="success" data-public-toast-message="@Model.SuccessMessage"></span>
+}
+@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+{
+    <span hidden data-public-toast-kind="error" data-public-toast-message="@Model.ErrorMessage"></span>
+}
+
+<div class="franchise-page" data-franchise-page>
+    <section class="franchise-hero">
+        <div class="franchise-hero-grid-bg" aria-hidden="true"></div>
+        <div class="container franchise-hero-grid">
+            <div class="franchise-hero-copy" data-fr-reveal>
+                <span class="eyebrow"><i></i> NAVID GELATO FRANCHISE</span>
+                <h1>یک شعبه جدید،<br /><span>با هویت نوید ژلاتو.</span></h1>
+                <p>اگر برای راه‌اندازی یک کسب‌وکار غذایی جدی برنامه داری و دوست داری با یک برند، منو و هویت مشخص وارد بازار بشی، این صفحه برای شروع گفتگو ساخته شده.</p>
+                <div class="franchise-hero-actions">
+                    <a class="btn btn-primary" href="#franchise-form">ثبت درخواست آنلاین <span>←</span></a>
+                    <a class="btn btn-ghost" href="tel:09122638537">تماس مستقیم: <b dir="ltr">0912 263 8537</b></a>
+                </div>
+                <div class="franchise-hero-facts">
+                    <div><b>۲ مسیر</b><span>تماس مستقیم یا فرم آنلاین</span></div>
+                    <div><b>بررسی اولیه</b><span>بر اساس شهر، موقعیت و شرایط همکاری</span></div>
+                    <div><b>شفاف</b><span>بدون وعده‌های تبلیغاتی مبهم</span></div>
+                </div>
+            </div>
+            <div class="franchise-hero-visual" aria-hidden="true">
+                <div class="franchise-orbit orbit-a"></div>
+                <div class="franchise-orbit orbit-b"></div>
+                <div class="franchise-product franchise-product-a"><img src="@Url.Content(SiteContentService.ArcherImage)" alt="" /></div>
+                <div class="franchise-product franchise-product-b"><img src="@Url.Content(SiteContentService.ClanImage)" alt="" /></div>
+                <div class="franchise-hero-mark"><b>NP</b><span>FRANCHISE</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="franchise-paths section">
+        <div class="container">
+            <div class="franchise-section-head" data-fr-reveal>
+                <span class="section-kicker">راه‌های شروع گفتگو</span>
+                <h2>دو راه ساده برای شروع.</h2>
+                <p>اگر سوال کوتاه و مشخصی داری، تماس مستقیم سریع‌تره. اگر می‌خوای اطلاعاتت ثبت بشه و تیم بررسی کنه، فرم آنلاین انتخاب بهتریه.</p>
+            </div>
+            <div class="franchise-path-grid">
+                <article class="franchise-path-card call" data-fr-card>
+                    <span class="path-index">01</span>
+                    <div class="path-icon">☎</div>
+                    <h3>تماس مستقیم</h3>
+                    <p>برای صحبت اولیه درباره شهر، شرایط کلی همکاری و مسیر شروع، مستقیم تماس بگیر.</p>
+                    <a href="tel:09122638537"><span>تماس با نوید ژلاتو</span><b dir="ltr">09122638537</b></a>
+                </article>
+                <article class="franchise-path-card form" data-fr-card>
+                    <span class="path-index">02</span>
+                    <div class="path-icon">✦</div>
+                    <h3>فرم آنلاین</h3>
+                    <p>نام و شماره تماس رو ثبت کن. اگر محل خاصی برای شعبه مدنظر داری یا توضیحی هست، اون رو هم بنویس.</p>
+                    <a href="#franchise-form"><span>ثبت درخواست</span><b>کمتر از ۲ دقیقه</b></a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="franchise-compare">
+        <div class="container">
+            <div class="franchise-section-head light" data-fr-reveal>
+                <span class="section-kicker light">FRANCHISE VS REPRESENTATION</span>
+                <h2>فرانچایز با نمایندگی یکی نیست.</h2>
+                <p>در عمل، جزئیات حقوقی هر مدل همکاری به قرارداد بستگی دارد؛ اما تفاوت مفهومی این دو مدل معمولاً در میزان استانداردسازی، کنترل برند و نحوه اداره کسب‌وکار دیده می‌شود.</p>
+            </div>
+            <div class="franchise-compare-grid">
+                <article class="compare-card franchise" data-fr-card>
+                    <small>FRANCHISE</small>
+                    <h3>فرانچایز</h3>
+                    <p>در مدل فرانچایز، معمولاً استفاده از برند همراه با سیستم اجرایی، استانداردهای عملیاتی، تجربه برند، منو و چارچوب مشخص همراه است.</p>
+                    <ul><li>هویت و استاندارد یکپارچه‌تر</li><li>استفاده از تجربه و مدل اجرایی برند</li><li>آزادی کمتر در تغییرات خارج از استاندارد</li><li>تمرکز بیشتر روی اجرای دقیق سیستم</li></ul>
+                </article>
+                <article class="compare-card representation" data-fr-card>
+                    <small>REPRESENTATION</small>
+                    <h3>نمایندگی</h3>
+                    <p>نمایندگی در بعضی کسب‌وکارها بیشتر بر فروش یا ارائه خدمات یک برند تمرکز دارد و الزاماً به معنی اجرای کامل مدل کسب‌وکار صاحب برند نیست.</p>
+                    <ul><li>ممکن است استقلال عملیاتی بیشتری داشته باشد</li><li>نوع رابطه بسته به قرارداد بسیار متفاوت است</li><li>احتمالاً کنترل کمتر روی تجربه کامل مشتری</li><li>ساختار درآمد و تعهدات می‌تواند متفاوت باشد</li></ul>
+                </article>
+            </div>
+            <p class="franchise-legal-note" data-fr-reveal>این توضیحات برای آشنایی عمومی هستند. نوع همکاری نهایی، تعهدات مالی، محدوده جغرافیایی، استانداردها و حقوق طرفین فقط در قرارداد رسمی همکاری مشخص می‌شوند.</p>
+        </div>
+    </section>
+
+    <section class="franchise-benefits section">
+        <div class="container">
+            <div class="franchise-section-head" data-fr-reveal>
+                <span class="section-kicker">چرا همکاری ساختارمند؟</span>
+                <h2>مزیتش فقط استفاده از اسم برند نیست.</h2>
+            </div>
+            <div class="benefit-grid">
+                <article data-fr-card><span>01</span><h3>هویت آماده برند</h3><p>به‌جای شروع از صفر برای نام، ظاهر و موقعیت برند، وارد چارچوبی می‌شی که از قبل شخصیت مشخصی دارد.</p></article>
+                <article data-fr-card><span>02</span><h3>منوی شناخته‌شده</h3><p>محصولات، نام‌گذاری و ساختار منو بخشی از تجربه‌ای هستند که مشتری با نوید ژلاتو می‌شناسد.</p></article>
+                <article data-fr-card><span>03</span><h3>استاندارد اجرایی</h3><p>چارچوب مشخص باعث می‌شود کیفیت تجربه مشتری بین شعب تا حد ممکن یکدست باقی بماند.</p></article>
+                <article data-fr-card><span>04</span><h3>شروع سریع‌تر</h3><p>وقتی ساختار اولیه مشخص باشد، زمان کمتری صرف آزمون‌وخطا در تصمیم‌های پایه می‌شود.</p></article>
+            </div>
+            <div class="tradeoff-panel" data-fr-reveal>
+                <div><span>اما واقعیت همکاری</span><h3>فرانچایز برای همه مناسب نیست.</h3></div>
+                <p>اگر ترجیح می‌دی منو، هویت بصری، قیمت‌گذاری، شیوه اجرا یا تجربه مشتری رو کاملاً مستقل تعیین کنی، مدل فرانچایز ممکنه محدودکننده به نظر برسه. مزیت اصلی این مدل همان چیزی است که محدودیتش هم محسوب می‌شود: <b>استاندارد و یکپارچگی.</b></p>
+            </div>
+        </div>
+    </section>
+
+    <section class="franchise-fit">
+        <div class="container franchise-fit-grid">
+            <div class="franchise-fit-copy" data-fr-reveal>
+                <span class="section-kicker light">آیا این همکاری برای تو مناسبه؟</span>
+                <h2>سرمایه مهمه،<br />ولی تنها معیار نیست.</h2>
+                <p>برای اداره یک شعبه موفق، حضور مدیریتی، پیگیری روزمره و پایبندی به کیفیت معمولاً به اندازه سرمایه اولیه اهمیت دارند.</p>
+            </div>
+            <div class="fit-list">
+                <div data-fr-card><b>01</b><span>برای مدیریت یا نظارت واقعی روی شعبه زمان داری.</span></div>
+                <div data-fr-card><b>02</b><span>استاندارد برند رو محدودیت نمی‌بینی، بلکه بخشی از ارزش همکاری می‌دونی.</span></div>
+                <div data-fr-card><b>03</b><span>برای انتخاب محل مناسب و راه‌اندازی اصولی عجله بی‌دلیل نداری.</span></div>
+                <div data-fr-card><b>04</b><span>کیفیت، تجربه مشتری و استمرار رو جدی‌تر از فروش کوتاه‌مدت می‌بینی.</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="franchise-process section">
+        <div class="container">
+            <div class="franchise-section-head" data-fr-reveal><span class="section-kicker">روند بررسی</span><h2>از درخواست تا تصمیم همکاری.</h2></div>
+            <div class="process-line">
+                <article data-fr-card><b>01</b><h3>ثبت درخواست</h3><p>تماس مستقیم یا فرم آنلاین.</p></article>
+                <article data-fr-card><b>02</b><h3>بررسی اولیه</h3><p>شهر، محل احتمالی و شرایط کلی متقاضی بررسی می‌شود.</p></article>
+                <article data-fr-card><b>03</b><h3>گفتگوی تکمیلی</h3><p>جزئیات مدل همکاری، نیازها و انتظارات دو طرف شفاف می‌شود.</p></article>
+                <article data-fr-card><b>04</b><h3>ارزیابی و قرارداد</h3><p>در صورت توافق، شرایط نهایی در قرارداد رسمی مشخص می‌شود.</p></article>
+            </div>
+        </div>
+    </section>
+
+    <section class="franchise-form-section" id="franchise-form">
+        <div class="container franchise-form-grid">
+            <div class="franchise-form-intro" data-fr-reveal>
+                <span class="section-kicker light">درخواست آنلاین فرانچایز</span>
+                <h2>اطلاعاتت رو بفرست،<br /><span>گفتگو از اینجا شروع میشه.</span></h2>
+                <p>شماره تماس برای پیگیری ضروریه. محل پیشنهادی و توضیحات اختیاری هستن و اگر هنوز تصمیم قطعی نگرفتی، می‌تونی خالی بذاری.</p>
+                <div class="form-direct-call"><span>برای تماس مستقیم</span><a href="tel:09122638537" dir="ltr">0912 263 8537</a></div>
+            </div>
+            <div class="franchise-form-card" data-fr-reveal data-fr-spotlight>
+                <form method="post" class="franchise-form">
+                    <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+                    <label><span>نام و نام خانوادگی *</span><input asp-for="Input.Name" autocomplete="name" placeholder="مثلاً امیر فروتن" /><span asp-validation-for="Input.Name" class="field-validation"></span></label>
+                    <label><span>شماره تماس *</span><input asp-for="Input.Mobile" inputmode="tel" autocomplete="tel" dir="ltr" placeholder="09xxxxxxxxx" /><span asp-validation-for="Input.Mobile" class="field-validation"></span></label>
+                    <label><span>شهر یا محل پیشنهادی <small>(اختیاری)</small></span><input asp-for="Input.ProposedLocation" placeholder="مثلاً رشت، گلسار" /><span asp-validation-for="Input.ProposedLocation" class="field-validation"></span></label>
+                    <label><span>شرح یا توضیحات <small>(اختیاری)</small></span><textarea asp-for="Input.Message" rows="5" maxlength="1000" placeholder="اگر درباره موقعیت، سابقه کاری یا شرایط مدنظرت توضیحی هست اینجا بنویس..."></textarea><span asp-validation-for="Input.Message" class="field-validation"></span></label>
+                    <button type="submit" class="btn btn-primary franchise-submit">ارسال درخواست فرانچایز <span>←</span></button>
+                    <p class="form-hint">پس از ارسال، اطلاعات درخواست از طریق سامانه پیامکی سایت برای شماره‌های مسئول پیگیری که در پنل مدیریت تعریف شده‌اند ارسال می‌شود.</p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="franchise-faq section">
+        <div class="container">
+            <div class="franchise-section-head" data-fr-reveal><span class="section-kicker">سوال‌های پرتکرار</span><h2>قبل از درخواست، این‌ها رو بدون.</h2></div>
+            <div class="franchise-faq-list">
+                <details data-fr-reveal><summary>آیا برای ثبت درخواست باید محل قطعی داشته باشم؟ <span>+</span></summary><p>نه. محل پیشنهادی در فرم اختیاریه. اگر هنوز در مرحله بررسی شهر یا منطقه هستی، درخواستت رو بدون محل هم می‌تونی ثبت کنی.</p></details>
+                <details data-fr-reveal><summary>آیا ارسال فرم به معنی تایید فرانچایز است؟ <span>+</span></summary><p>نه. فرم فقط شروع فرایند بررسیه. تایید همکاری بعد از بررسی شرایط، گفتگو و توافق نهایی انجام می‌شود.</p></details>
+                <details data-fr-reveal><summary>هزینه راه‌اندازی چقدره؟ <span>+</span></summary><p>هزینه نهایی به شرایط روز، شهر، متراژ، وضعیت ملک، تجهیزات و مدل همکاری بستگی دارد و بهتر است بعد از بررسی اولیه اعلام شود.</p></details>
+                <details data-fr-reveal><summary>آیا می‌تونم منو یا ظاهر شعبه رو تغییر بدم؟ <span>+</span></summary><p>در مدل فرانچایز معمولاً بخشی از ارزش همکاری از یکپارچگی برند میاد؛ بنابراین میزان آزادی تغییرات باید در چارچوب استانداردها و قرارداد مشخص شود.</p></details>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Head {
+    <link rel="stylesheet" href="~/css/franchise.css" asp-append-version="true" />
+}
+@section Scripts {
+    <script src="~/js/franchise.js" asp-append-version="true"></script>
+}

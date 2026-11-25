@@ -1,0 +1,53 @@
+@page "/pay/{token}"
+@model NavidGelato_Site.Pages.PayModel
+@{
+    Layout = null;
+    var title = Model.State switch
+    {
+        "paid" => "پرداخت موفق",
+        "expired" => "لینک منقضی شده",
+        "not-found" => "لینک نامعتبر",
+        "preparing" => "در حال اتصال",
+        _ => "پرداخت نوید ژلاتو"
+    };
+}
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>@title - نوید ژلاتو</title>
+    <link rel="stylesheet" href="~/css/payment-link.css" asp-append-version="true" />
+</head>
+<body class="payment-page">
+<main class="payment-card">
+    <div class="payment-logo">NP</div>
+    <span class="payment-kicker">NAVID GELATO PAYMENT</span>
+    <h1>@title</h1>
+    <p>@Model.Message</p>
+
+    @if (Model.Amount.HasValue)
+    {
+        <div class="payment-amount">
+            <span>مبلغ پرداخت</span>
+            <strong>@Model.Amount.Value.ToString("N0") <small>ریال</small></strong>
+        </div>
+    }
+
+    @if (Model.State == "gateway-error")
+    {
+        <a class="payment-action" href="javascript:location.reload()">تلاش دوباره</a>
+    }
+    else if (Model.State == "preparing")
+    {
+        <div class="payment-spinner" aria-hidden="true"></div>
+    }
+
+    @if (Model.ExpiresAtUtc.HasValue && Model.State != "paid" && Model.State != "expired")
+    {
+        <small>این لینک از اولین باز شدن فقط ۱۵ دقیقه اعتبار دارد.</small>
+    }
+</main>
+</body>
+</html>

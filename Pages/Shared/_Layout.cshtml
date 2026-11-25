@@ -1,0 +1,204 @@
+@using System.Globalization
+@using Microsoft.AspNetCore.Html
+@using NavidGelato_Site.Services
+@inject SiteContentService SiteContent
+@{
+    var pageTitle = ViewData["Title"]?.ToString() ?? "نوید ژلاتو | ساندویچ‌های سرد و گرم";
+    var description = ViewData["Description"]?.ToString() ?? "نوید ژلاتو؛ ساندویچ‌های سرد و گرم با نام‌های شخصیت‌محور، منوی دیجیتال، قیمت روز، شعب و مسیریابی مستقیم.";
+    var canonical = ViewData["Canonical"]?.ToString() ?? "https://navidgelato.example/";
+    var httpRequest = ViewContext.HttpContext.Request;
+    var requestPath = httpRequest.Path.Value?.TrimEnd('/') ?? string.Empty;
+    var isHomePage = string.IsNullOrEmpty(requestPath) || requestPath.Equals("/Index", StringComparison.OrdinalIgnoreCase);
+    var ogImageSource = ViewData["OgImage"]?.ToString() ?? SiteContentService.BrandBannerImage;
+    var ogImagePath = Url.Content(ogImageSource);
+    var ogImage = Uri.TryCreate(ogImagePath, UriKind.Absolute, out var absoluteOgImage)
+        ? absoluteOgImage.ToString()
+        : $"{httpRequest.Scheme}://{httpRequest.Host}{ogImagePath}";
+    var brandBannerPath = Url.Content(SiteContentService.BrandBannerImage);
+    var brandBannerUrl = $"{httpRequest.Scheme}://{httpRequest.Host}{brandBannerPath}";
+    var logoPath = Url.Content(SiteContentService.LogoImage);
+    var logoUrl = $"{httpRequest.Scheme}://{httpRequest.Host}{logoPath}";
+    var upcomingOpening = await SiteContent.GetUpcomingOpeningBranchAsync();
+    var siteSettings = await SiteContent.GetSiteSettingsAsync();
+    var enamadValue = siteSettings?.EnamadHtml?.Trim();
+    Uri? enamadUri = null;
+    var enamadIsUrl = !string.IsNullOrWhiteSpace(enamadValue) && Uri.TryCreate(enamadValue, UriKind.Absolute, out enamadUri) && (enamadUri.Scheme == Uri.UriSchemeHttp || enamadUri.Scheme == Uri.UriSchemeHttps);
+    var enamadIsHtml = !string.IsNullOrWhiteSpace(enamadValue) && enamadValue.Contains('<') && enamadValue.Contains('>');
+    var showEnamad = enamadIsUrl || enamadIsHtml;
+    var openingEndIso = upcomingOpening?.OpeningDateTime is DateTime openingDate
+        ? openingDate.ToString("yyyy-MM-dd'T'HH:mm:ss", CultureInfo.InvariantCulture) + "+03:30"
+        : null;
+    var openingStorageKey = upcomingOpening?.OpeningDateTime is DateTime openingKeyDate
+        ? $"{upcomingOpening.Id}-{openingKeyDate.Ticks}"
+        : null;
+}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@pageTitle</title>
+    <meta name="description" content="@description" />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <link rel="canonical" href="@canonical" />
+    <meta property="og:locale" content="fa_IR" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="نوید ژلاتو" />
+    <meta property="og:title" content="@pageTitle" />
+    <meta property="og:description" content="@description" />
+    <meta property="og:url" content="@canonical" />
+    <meta property="og:image" content="@ogImage" />
+    <meta property="og:image:alt" content="نوید ژلاتو" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="@pageTitle" />
+    <meta name="twitter:description" content="@description" />
+    <meta name="twitter:image" content="@ogImage" />
+    <meta name="theme-color" content="#8f1026" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/final-polish.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site-navigation.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site-enhancements.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/scroll-experience.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/scroll-experience-extra.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/home-intro.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/interior-experience.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site-cinematic-motion.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/public-toasts.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/all.css" />
+    @await RenderSectionAsync("Head", required: false)
+    <script type="application/ld+json">
+            {
+              "@@context": "https://schema.org",
+              "@@graph": [
+                {
+                  "@@type": "Organization",
+                  "@@id": "https://navidgelato.example/#organization",
+                  "name": "نوید ژلاتو",
+                  "alternateName": "NAVID GELATO",
+                  "url": "https://navidgelato.example/",
+                  "description": "نوید ژلاتو؛ برند ساندویچ‌های سرد و گرم با نام‌گذاری شخصیت‌محور و شعب متعدد در ایران.",
+                  "image": "@brandBannerUrl",
+                  "logo": "@logoUrl",
+                  "sameAs": ["https://www.instagram.com/navid_gelato/"]
+                },
+                {
+                  "@@type": "WebSite",
+                  "@@id": "https://navidgelato.example/#website",
+                  "url": "https://navidgelato.example/",
+                  "name": "نوید ژلاتو",
+                  "alternateName": "NAVID GELATO",
+                  "inLanguage": "fa-IR",
+                  "publisher": { "@@id": "https://navidgelato.example/#organization" }
+                }
+              ]
+            }
+    </script>
+</head>
+<body class="@(upcomingOpening is not null ? "has-opening-announcement" : "")">
+    @if (upcomingOpening is not null)
+    {
+        <div class="opening-announcement-bar" data-opening-bar data-opening-end="@openingEndIso">
+            <div class="celebration-confetti" aria-hidden="true">@for (var i = 0; i < 18; i++) {
+                <i></i>
+            }
+        </div>
+        <div class="container opening-announcement-inner">
+            <div class="opening-announcement-copy"><span class="opening-live-dot"></span><b>افتتاح شعبه @upcomingOpening.Name</b><span class="opening-bar-date">@upcomingOpening.GetOpeningDateTimeText()</span><span class="opening-countdown" data-opening-countdown></span></div>
+            <button type="button" class="opening-details-shortcut" data-opening-details>اطلاعات شعبه <span>←</span></button>
+        </div>
+    </div>
+}
+
+<header class="site-header" data-site-header>
+    <div class="site-nav-backdrop" data-nav-backdrop></div>
+    <div class="container nav-shell">
+        <a class="brand" asp-page="/Index" aria-label="صفحه اصلی نوید ژلاتو"><img class="brand-mark brand-logo-image" src="@logoPath" alt="لوگوی نوید ژلاتو" /><span class="brand-copy"><b>NAVID GELATO</b><small>نوید ژلاتو</small></span></a>
+        <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="main-nav" aria-label="نمایش منو"><span></span><span></span><span></span></button>
+        <nav class="main-nav" id="main-nav" data-nav>
+            <div class="site-nav-mobile-head">
+                <div class="site-nav-mobile-brand">
+                    <img class="brand-mark brand-logo-image" src="@logoPath" alt="لوگوی نوید ژلاتو" />
+                    <div class="brand-copy"><b>NAVID GELATO</b><small>نوید ژلاتو</small><span class="brand-tagline">منوی دسترسی سریع</span></div>
+                </div>
+                <button type="button" class="site-nav-close" data-nav-close aria-label="بستن منو">×</button>
+            </div>
+            <a asp-page="/Index">خانه</a>
+            <a asp-page="/Menu">منوی دیجیتال</a>
+            <a asp-page="/Branches">شعب</a>
+            <a asp-page="/Franchise">فرانچایز</a>
+            <a asp-page="/Contact">ارتباط با ما</a>
+        </nav>
+        <a class="header-cta" asp-page="/Menu">دیدن منو <span>←</span></a>
+    </div>
+</header>
+
+<main>@RenderBody()</main>
+
+<footer class="site-footer">
+    <div class="container footer-grid">
+        <div><a class="brand footer-brand" asp-page="/Index"><img class="brand-mark brand-logo-image" src="@logoPath" alt="لوگوی نوید ژلاتو" /><span class="brand-copy"><b>NAVID GELATO</b><small>نوید ژلاتو</small></span></a><p>نوید ژلاتو؛ ساندویچ‌های سرد و گرم با شخصیت‌های خاص خودش.</p></div>
+        <div><h3>دسترسی سریع</h3><a asp-page="/Menu">منوی دیجیتال</a><a asp-page="/Branches">شعب نوید ژلاتو</a><a asp-page="/Franchise">درخواست فرانچایز</a><a asp-page="/Contact">ارتباط با ما</a></div>
+        <div><h3>شعبه مرکزی</h3><p>کرج، عظیمیه، پایین‌تر از میدان اسبی، بین خیابان خیام و ارکیده</p><a href="tel:02632527272" dir="ltr">026 3252 7272</a></div>
+            <div><h3>شبکه اجتماعی</h3><a href="https://www.instagram.com/navid_gelato/" rel="noopener" target="_blank"><i class="fa-brands fa-instagram" style="width: 1rem;height: 1rem;padding-left: 4px;"></i>navid_gelato</a><span class="footer-hours">همه‌روزه ۱۰ صبح تا ۱۲ شب</span></div>
+    </div>
+    @if (showEnamad)
+    {
+        <div class="container footer-trust-row">
+            <div class="footer-trust-copy"><b>اعتماد و خرید امن</b><span>برای بررسی اعتبار نماد روی آن کلیک کنید.</span></div>
+            <div class="footer-enamad">
+                @if (enamadIsUrl && enamadUri is not null)
+                {
+                    <a class="enamad-link" href="@enamadUri" target="_blank" rel="noopener nofollow" aria-label="مشاهده نماد اعتماد الکترونیکی نوید ژلاتو">
+                        <span class="enamad-symbol" aria-hidden="true"><svg viewBox="0 0 32 32" focusable="false"><path d="M16 2.5 27 6.8v8.4c0 7.1-4.5 11.7-11 14.3C9.5 26.9 5 22.3 5 15.2V6.8L16 2.5Z" /><path d="m10.8 16 3.2 3.2 7.2-7.4" /></svg></span>
+                        <span><b>اینماد</b><small>نماد اعتماد الکترونیکی</small></span>
+                    </a>
+                }
+                else if (enamadIsHtml)
+                {
+                    @Html.Raw(enamadValue)
+                }
+            </div>
+        </div>
+    }
+    <div class="container footer-bottom">
+        <span>© @DateTime.Now.Year NAVID GELATO</span>
+        @if (isHomePage)
+        {
+            <a class="site-creator-signature" href="https://pargasdesi.ir" target="_blank" rel="noopener" aria-label="طراحی و توسعه سایت توسط پارگاس">
+                <span>طراحی و توسعه توسط</span>
+                <strong>PARGAS</strong>
+                <small>pargasdesi.ir</small>
+            </a>
+        }
+    </div>
+</footer>
+
+@if (upcomingOpening is not null)
+{
+    <div class="opening-modal-backdrop" data-opening-modal data-opening-key="@openingStorageKey" data-opening-end="@openingEndIso" hidden>
+        <section class="opening-modal" role="dialog" aria-modal="true" aria-labelledby="opening-modal-title">
+            <div class="celebration-confetti modal-confetti" aria-hidden="true">@for (var i = 0; i < 24; i++) {
+                <i></i>
+            }
+        </div>
+        <button type="button" class="opening-modal-close" data-opening-close aria-label="بستن">×</button>
+        <span class="opening-modal-kicker">یک خبر خوشمزه 🎉</span>
+        <h2 id="opening-modal-title">شعبه @upcomingOpening.Name<br /><strong>در راهه!</strong></h2>
+        <p class="opening-modal-lead">برای افتتاح شعبه جدید نوید ژلاتو آماده شو.</p>
+        <div class="opening-modal-info"><div><span>تاریخ و ساعت افتتاح</span><b>@upcomingOpening.GetOpeningDateTimeText()</b></div><div><span>شهر</span><b>@upcomingOpening.City</b></div><div class="wide"><span>آدرس</span><b>@upcomingOpening.Address</b></div></div>
+        <div class="opening-modal-actions"><a href="@upcomingOpening.GetNeshanUrl()" target="_blank" rel="noopener">مسیریابی با نشان</a><a href="@upcomingOpening.GetGoogleMapsUrl()" target="_blank" rel="noopener">Google Maps</a><a href="/Branches#branch-@upcomingOpening.Id">صفحه شعبه</a></div>
+    </section>
+</div>
+    }
+
+<script src="~/js/site.js" asp-append-version="true"></script>
+<script src="~/js/scroll-experience.js" asp-append-version="true"></script>
+<script src="~/js/scroll-experience-extra.js" asp-append-version="true"></script>
+<script src="~/js/home-intro.js" asp-append-version="true"></script>
+<script src="~/js/interior-experience.js" asp-append-version="true"></script>
+<script src="~/js/public-toasts.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+<script src="~/js/site-cinematic-motion.js" asp-append-version="true"></script>
+<script src="~/js/all.js"></script>
+</body>
+</html>

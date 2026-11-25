@@ -1,0 +1,40 @@
+@page "/payment/callback"
+@model NavidGelato_Site.Pages.PaymentCallbackModel
+@{
+    Layout = null;
+    var success = Model.State == "paid";
+    var title = success ? "پرداخت موفق" : Model.State == "pending" ? "در انتظار تایید" : "پرداخت ناموفق";
+}
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>@title - نوید ژلاتو</title>
+    <link rel="stylesheet" href="~/css/payment-link.css" asp-append-version="true" />
+</head>
+<body class="payment-page">
+<main class="payment-card @(success ? "is-success" : Model.State == "pending" ? "is-pending" : "is-error")">
+    <div class="payment-result-icon">@(success ? "✓" : Model.State == "pending" ? "…" : "×")</div>
+    <span class="payment-kicker">NAVID GELATO PAYMENT</span>
+    <h1>@title</h1>
+    <p>@Model.Message</p>
+
+    @if (Model.Amount.HasValue)
+    {
+        <div class="payment-amount">
+            <span>مبلغ</span>
+            <strong>@Model.Amount.Value.ToString("N0") <small>ریال</small></strong>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.TraceNo))
+    {
+        <div class="payment-trace"><span>کد رهگیری</span><b dir="ltr">@Model.TraceNo</b></div>
+    }
+
+    <small>این صفحه را می‌توانید ببندید. وضعیت نهایی از طریق API نیز برای شعبه قابل استعلام است.</small>
+</main>
+</body>
+</html>

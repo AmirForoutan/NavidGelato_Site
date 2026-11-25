@@ -1,0 +1,227 @@
+@page
+@model IndexModel
+@using NavidGelato_Site.Services
+@using System.Text.Json
+@{
+    ViewData["Title"] = "نوید ژلاتو | ساندویچ‌های سرد و گرم با شخصیت‌های خاص";
+    ViewData["Description"] = "سایت رسمی نوید ژلاتو؛ داستان نام‌گذاری ساندویچ‌هایی مثل آرچر و والکری، منوی دیجیتال و قیمت‌ها، شعب و مسیریابی مستقیم.";
+    ViewData["Canonical"] = "https://navidgelato.example/";
+    ViewData["OgImage"] = SiteContentService.ArcherImage;
+    var mapBranches = Model.Branches
+        .Where(x => x.HasCoordinates)
+        .Select(x => new
+        {
+            id = x.Id,
+            name = x.Name,
+            city = x.City,
+            address = x.Address,
+            lat = x.Latitude!.Value,
+            lng = x.Longitude!.Value,
+            detailsUrl = $"{Url.Page("/Branches")}#branch-{x.Id}"
+        })
+        .ToList();
+    var mapBranchesJson = JsonSerializer.Serialize(mapBranches);
+}
+<section class="hero home-hero">
+    <div class="hero-noise"></div>
+    <div class="container hero-grid">
+        <div class="hero-copy reveal">
+            <span class="eyebrow"><i></i> NAVID GELATO / EST. WITH TASTE</span>
+            <h1>تو دل برو<br /><span>با نوید ژلاتو.</span></h1>
+            <p>ساندویچ‌هایی که فقط اسم ندارند، شخصیت دارند. از سردهای کلاسیک تا ترکیب‌های پرو و گرم، با یک امضای قرمز و مشکی که سخت می‌شود ندیدش.</p>
+            <div class="hero-actions"><a class="btn btn-primary" asp-page="/Menu">منو <span>←</span></a><a class="btn btn-ghost" asp-page="/Branches">پیدا کردن شعبه</a></div>
+            <div class="hero-stats"><div><b>@Model.Branches.Count+</b><span>شعبه</span></div><div><b>۱۰ تا ۲۴</b><span>ساعات کاری مرکزی</span></div><div><b>سرد + گرم</b><span>برای هر سلیقه</span></div></div>
+        </div>
+        <div class="hero-media reveal reveal-delay">
+            <div class="hero-image-wrap hero-product-showcase"><img class="hero-sandwich-image" src="@Url.Content(SiteContentService.ArcherImage)" alt="ساندویچ بربر نوید ژلاتو" fetchpriority="high" /></div>
+            <div class="hero-card hero-card-top">یک برند،<br /><b>چند شخصیت خوشمزه</b></div><div class="hero-card hero-card-bottom"><span>●</span> شعب فعال در چند شهر ایران</div>
+        </div>
+    </div>
+    <div class="hero-scroll-cue" aria-hidden="true"><span>SCROLL</span><i></i></div>
+</section>
+
+<section class="ticker" aria-label="ویژگی‌های نوید ژلاتو"><div class="ticker-track"><div class="ticker-group"><span>ساندویچ سرد</span><i>✦</i><span>ساندویچ گرم</span><i>✦</i><span>ترکیب‌های PRO</span><i>✦</i><span>منوی دیجیتال</span><i>✦</i><span>شعب متعدد</span><i>✦</i></div><div class="ticker-group" aria-hidden="true"><span>ساندویچ سرد</span><i>✦</i><span>ساندویچ گرم</span><i>✦</i><span>ترکیب‌های PRO</span><i>✦</i><span>منوی دیجیتال</span><i>✦</i><span>شعب متعدد</span><i>✦</i></div></div></section>
+
+<section class="section brand-story story-scroll-section">
+    <div class="container story-grid">
+        <div class="section-heading story-sticky reveal"><span class="section-kicker">داستان برند</span><h2>چرا آرچر، والکری<br />و شخصیت‌های کلش؟</h2></div>
+        <div class="story-copy">
+            <p class="lead story-step">اسم‌های متفاوت منوی نوید ژلاتو از یک ایده واقعی و شخصی شروع شدند، نه از جلسه‌ای پر از نمودار و کلمه «برندینگ».</p>
+            <blockquote class="founder-story story-step"><span>«</span><p>من نوید هستم، متولد ۱۳۷۳ و عاشق بازی کلش. توی ۲۷ سالگی، موقع بازی Clash of Clans یک ایده جالب به ذهنم رسید: برای تمام ساندویچ‌هام یک اسم از شخصیت‌های بازی بذارم. خوبه؟ نه؟</p><footer>نوید، درباره شروع نام‌گذاری شخصیت‌محور منو</footer></blockquote>
+            <p class="story-step">همین ایده تبدیل شد به بخشی از هویت نوید ژلاتو؛ جایی که محصول فقط یک شماره یا ترکیب مواد نیست و اسم‌هایی مثل آرچر و والکری کمک می‌کنند هر ساندویچ شخصیت خودش را داشته باشد.</p>
+            <p class="story-step">اینجا انتخاب غذا قرار نیست فقط «ساندویچ شماره سه» باشد. اسم، ظاهر و حس هر انتخاب کنار هم قرار گرفته‌اند تا منو راحت‌تر در ذهن بماند و هرکس کم‌کم شخصیت مورد علاقه خودش را پیدا کند.</p>
+            <p class="brand-affiliation-note story-step">نام‌های الهام‌گرفته از Clash of Clans صرفاً بخشی از داستان نام‌گذاری نوید ژلاتو هستند و به معنی وابستگی یا همکاری رسمی با سازنده بازی نیستند.</p>
+            <a class="text-link story-step" asp-page="/Menu">شخصیت ساندویچت رو پیدا کن <span>←</span></a>
+        </div>
+    </div>
+</section>
+
+<section class="identity-scroll-scene" data-identity-scene aria-label="هویت شخصیت‌محور نوید ژلاتو">
+    <div class="identity-scroll-sticky">
+        <div class="identity-grid-lines" aria-hidden="true"></div>
+        <div class="identity-scene-copy">
+            <span class="identity-scene-kicker">NAVID GELATO CHARACTER MENU</span>
+            <h2 class="identity-word identity-word-one">فقط ساندویچ نیست.</h2>
+            <h2 class="identity-word identity-word-two">یک شخصیت داره.</h2>
+            <strong>NAVID GELATO</strong>
+        </div>
+        <div class="identity-product" aria-hidden="true">
+            <span class="identity-product-ring"></span>
+            <img src="@Url.Content(SiteContentService.ArcherImage)" alt="" loading="lazy" />
+        </div>
+        <div class="identity-scene-index" aria-hidden="true"><span>01</span><i></i><span>03</span></div>
+        <p class="identity-scene-caption">اسکرول کن؛ از اسم تا شخصیت، از شخصیت تا انتخاب.</p>
+    </div>
+</section>
+
+<section class="menu-journey" data-menu-journey>
+    <div class="container menu-journey-grid">
+        <div class="menu-journey-visual" aria-hidden="true">
+            <div class="journey-visual-stage">
+                <div class="journey-orbit journey-orbit-one"></div>
+                <div class="journey-orbit journey-orbit-two"></div>
+                <figure class="journey-image journey-image-1 active"><img src="@Url.Content(SiteContentService.ArcherImage)" alt="" loading="lazy" /></figure>
+                <figure class="journey-image journey-image-2"><img src="@Url.Content(SiteContentService.ClanImage)" alt="" loading="lazy" /></figure>
+                <figure class="journey-image journey-image-3"><img src="@Url.Content(SiteContentService.StoreImage)" alt="" loading="lazy" /></figure>
+                <div class="journey-center-mark"><b>NP</b><span>01</span></div>
+            </div>
+        </div>
+        <div class="menu-journey-copy">
+            <div class="journey-heading reveal"><span class="section-kicker">از انتخاب تا اولین لقمه</span><h2>سه قدم،<br /><span>یک انتخاب کاملاً پرو.</span></h2><p>منوی نوید ژلاتو طوری ساخته شده که از اسم محصول تا پیدا کردن شعبه، مسیر انتخاب ساده و به‌یادماندنی بماند.</p></div>
+            <article class="journey-step" data-journey-step="1"><span class="journey-number">01</span><div><small>CHARACTER</small><h3>اول شخصیتت رو انتخاب کن.</h3><p>آرچر، والکری یا یکی از ترکیب‌های PRO؟ اسم‌ها کمک می‌کنند محصولی که دوست داشتی دفعه بعد هم راحت‌تر یادت بماند.</p><a asp-page="/Menu">رفتن به منوی دیجیتال <span>←</span></a></div></article>
+            <article class="journey-step" data-journey-step="2"><span class="journey-number">02</span><div><small>TASTE</small><h3>بعد سبک طعمت رو پیدا کن.</h3><p>از انتخاب‌های سرد و سریع تا ساندویچ‌های گرم و ترکیب‌های پرحجم‌تر، منو برای سلیقه‌ها و وقت‌های مختلف طراحی شده.</p><a asp-page="/Menu">دیدن همه انتخاب‌ها <span>←</span></a></div></article>
+            <article class="journey-step" data-journey-step="3"><span class="journey-number">03</span><div><small>LOCATION</small><h3>آخرش نزدیک‌ترین شعبه رو پیدا کن.</h3><p>آدرس، تلفن و مسیریابی شعب در یک صفحه است. موقعیتت رو بده و نزدیک‌ترین شعبه دایر رو پیدا کن.</p><a asp-page="/Branches">پیدا کردن شعبه <span>←</span></a></div></article>
+        </div>
+    </div>
+</section>
+
+<section class="section showcase-section">
+    <div class="container">
+        <div class="section-heading inline reveal"><div><span class="section-kicker">انتخاب‌های نوید ژلاتو</span><h2>از آرچر تا والکری</h2></div><a class="btn btn-dark" asp-page="/Menu">مشاهده همه منو</a></div>
+        <div class="showcase-grid">
+            <article class="showcase-card showcase-large" data-scroll-card data-tilt-card><img src="@Url.Content(SiteContentService.ArcherImage)" alt="ساندویچ بربر نوید ژلاتو" loading="lazy" /><div class="card-overlay"><span>ساندویچ سرد</span><h3>بربر</h3><p>یکی از امضاهای شناخته‌شده منو</p></div></article>
+            <article class="showcase-card" data-scroll-card data-tilt-card><img src="@Url.Content(SiteContentService.ClanImage)" alt="ساندویچ جاینت نوید ژلاتو" loading="lazy" /><div class="card-overlay"><span>PRO SERIES</span><h3>جاینت پرو</h3></div></article>
+            <article class="showcase-card red-card" data-scroll-card data-tilt-card><img src="@Url.Content(SiteContentService.BrandBannerImage)" alt="نوید ژلاتو آف کلنز" loading="lazy" /><div class="card-overlay"><span>هویت برند</span><h3>هر ساندویچ، یک شخصیت</h3></div></article>
+        </div>
+    </div>
+</section>
+
+<section class="brand-numbers" aria-label="داستان نوید ژلاتو در چند عدد">
+    <div class="container">
+        <div class="brand-numbers-head reveal"><span class="section-kicker light">داستان در چند عدد</span><h2>بعضی عددها،<br />بخشی از قصه‌اند.</h2></div>
+        <div class="brand-number-grid">
+            <article class="brand-number-card" data-count-card><span class="brand-number-index">01</span><strong data-counter="1373">۰</strong><p>سال تولد نوید؛ کسی که بعدها ایده نام‌گذاری شخصیت‌محور منو به ذهنش رسید.</p></article>
+            <article class="brand-number-card" data-count-card><span class="brand-number-index">02</span><strong data-counter="27">۰</strong><p>سن نوید وقتی وسط بازی کلش، ایده نام‌گذاری ساندویچ‌ها با شخصیت‌های بازی شکل گرفت.</p></article>
+            <article class="brand-number-card accent" data-count-card><span class="brand-number-index">03</span><strong data-counter="@Model.Branches.Count">۰</strong><em>+</em><p>شعبه ثبت‌شده در شبکه نوید ژلاتو؛ و مسیر قرار نیست همین‌جا متوقف شود.</p></article>
+        </div>
+    </div>
+</section>
+
+<section class="brand-marquee-zone" aria-hidden="true">
+    <div class="brand-marquee brand-marquee-forward"><div><span>NAVID GELATO</span><i>✦</i><span>ARCHER</span><i>✦</i><span>VALKYRIE</span><i>✦</i><span>CHARACTER MENU</span><i>✦</i></div><div><span>NAVID GELATO</span><i>✦</i><span>ARCHER</span><i>✦</i><span>VALKYRIE</span><i>✦</i><span>CHARACTER MENU</span><i>✦</i></div></div>
+    <div class="brand-marquee brand-marquee-reverse"><div><span>سرد</span><i>●</i><span>گرم</span><i>●</i><span>PRO</span><i>●</i><span>هر ساندویچ، یک شخصیت</span><i>●</i></div><div><span>سرد</span><i>●</i><span>گرم</span><i>●</i><span>PRO</span><i>●</i><span>هر ساندویچ، یک شخصیت</span><i>●</i></div></div>
+</section>
+
+@if (mapBranches.Count > 0)
+{
+<section class="home-branch-map-section" data-home-branch-map
+         data-geo-url="@Url.Content("~/data/iran-provinces.json")"
+         data-logo-url="@Url.Content(SiteContentService.LogoImage)"
+         data-tile-status-url="@Url.Content("~/map/offline/status")"
+         data-tile-url="@Url.Content("~/map/offline/tiles/{z}/{x}/{y}.pbf")">
+    <div class="container">
+        <div class="home-branch-map-head reveal">
+            <div>
+                <span class="section-kicker">شعب نوید ژلاتو روی نقشه</span>
+                <h2>ببین کجای ایران<br /><span>نزدیکت هستیم.</span></h2>
+            </div>
+            <p>فقط شعبه‌هایی روی این نقشه نمایش داده می‌شوند که موقعیت جغرافیایی آن‌ها ثبت شده باشد. روی هر نشان کلیک کن، زوم کن یا نقشه را بکش تا موقعیت شعبه‌ها را دقیق‌تر ببینی.</p>
+        </div>
+
+        <div class="home-branch-map-layout">
+            <div class="home-map-shell">
+                <div class="home-map-stage" data-home-map-stage>
+                    <div class="home-map-canvas" data-home-map-canvas hidden aria-label="نقشه خیابانی آفلاین شعب نوید ژلاتو"></div>
+                    <svg class="home-map-fallback" data-home-map-svg viewBox="0 0 1000 760" role="img" aria-label="نقشه شعب نوید ژلاتو در ایران">
+                        <g data-home-map-world>
+                            <g data-home-map-provinces></g>
+                            <g data-home-map-markers></g>
+                        </g>
+                    </svg>
+                </div>
+
+                <div class="home-map-loading" data-home-map-loading>در حال آماده‌سازی نقشه محلی…</div>
+
+                <div class="home-map-controls" aria-label="کنترل‌های نقشه">
+                    <button class="home-map-control" type="button" data-home-map-zoom-in aria-label="بزرگ‌نمایی">+</button>
+                    <button class="home-map-control" type="button" data-home-map-zoom-out aria-label="کوچک‌نمایی">−</button>
+                    <button class="home-map-control reset" type="button" data-home-map-reset aria-label="نمایش کل ایران">⌂</button>
+                </div>
+
+                <aside class="home-map-info" data-home-map-info aria-live="polite">
+                    <small data-home-map-info-city></small>
+                    <h3 data-home-map-info-name></h3>
+                    <p data-home-map-info-address></p>
+                    <a data-home-map-info-link href="@Url.Page("/Branches")">مشاهده جزئیات شعبه <span>←</span></a>
+                </aside>
+
+                <div class="home-map-legend"><i></i><span>@mapBranches.Count شعبه دارای موقعیت ثبت‌شده</span></div>
+                <span class="home-map-source-note">نقشه محلی • داده خیابانی © OpenStreetMap contributors / Geofabrik</span>
+            </div>
+
+            <aside class="home-map-side">
+                <div class="home-map-side-head">
+                    <span>LOCATIONS / @mapBranches.Count</span>
+                    <h3>شعب روی نقشه</h3>
+                </div>
+
+                <div class="home-map-branch-list">
+                    @foreach (var branch in Model.Branches.Where(x => x.HasCoordinates))
+                    {
+                        <button class="home-map-branch-btn" type="button" data-home-map-branch="@branch.Id">
+                            <span class="home-map-branch-logo"><img src="@Url.Content(SiteContentService.LogoImage)" alt="" /></span>
+                            <span>
+                                <b>@branch.Name</b>
+                                <span>@branch.City</span>
+                            </span>
+                        </button>
+                    }
+                </div>
+
+                <div class="home-map-foot">
+                    با چرخ ماوس یا دکمه‌های + و − زوم کن و با Drag نقشه را جابه‌جا کن.
+                    <br /><a asp-page="/Branches">مشاهده صفحه کامل شعب <span>←</span></a>
+                </div>
+            </aside>
+        </div>
+
+        <script type="application/json" data-branch-map-data>@Html.Raw(mapBranchesJson)</script>
+    </div>
+</section>
+}
+
+<section class="section branch-preview"><div class="container branch-preview-grid"><div class="branch-photo reveal"><img src="@Url.Content(SiteContentService.StoreImage)" alt="نمای یکی از شعب نوید ژلاتو" loading="lazy" data-scroll-layer /></div><div class="branch-preview-copy reveal"><span class="section-kicker">نزدیکت هستیم</span><h2>از کرج تا تهران، اهواز و شمال</h2><p>شعب نوید ژلاتو را با آدرس و شماره تماس ببین و مستقیم با مسیریاب گوشی، نشان، بلد، ویز یا گوگل‌مپ مسیرت را باز کن.</p><div class="mini-branches">@foreach (var branch in Model.Branches.Take(4)) { <div><b>@branch.Name</b><span>@branch.City</span></div> }</div><a class="btn btn-primary" asp-page="/Branches">همه شعب <span>←</span></a></div></div></section>
+
+<section class="final-choice" data-final-choice>
+    <div class="final-choice-bg" aria-hidden="true"><span>NP</span></div>
+    <div class="container final-choice-inner">
+        <div class="final-choice-copy reveal"><span class="section-kicker light">حالا نوبت توئه</span><h2>شخصیتت رو انتخاب کن،<br /><span>بقیه مسیر با ما.</span></h2><p>منو رو ببین، محصولت رو انتخاب کن و نزدیک‌ترین نوید ژلاتو رو پیدا کن.</p></div>
+        <div class="final-choice-actions">
+            <a class="final-choice-card primary" asp-page="/Menu" data-tilt-card><small>01 / MENU</small><b>منوی دیجیتال</b><span>قیمت‌ها و شخصیت‌های منو رو ببین</span><i>←</i></a>
+            <a class="final-choice-card" asp-page="/Branches" data-tilt-card><small>02 / LOCATIONS</small><b>نزدیک‌ترین شعبه</b><span>آدرس، تماس و مسیریابی مستقیم</span><i>←</i></a>
+        </div>
+    </div>
+</section>
+
+<section class="section cta-section"><div class="container cta-card reveal" data-spotlight><div><span class="section-kicker light">حرفی هست؟</span><h2>مستقیم به خود نوید ژلاتو بگو.</h2><p>انتقاد، پیشنهاد، درخواست همکاری یا هر موضوع دیگری را برای مجموعه بفرست.</p></div><a class="btn btn-light" asp-page="/Contact">ارسال درخواست <span>←</span></a></div></section>
+
+
+@section Head {
+    <link rel="stylesheet" href="~/lib/maplibre/maplibre-gl.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/home-branch-map.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/lib/maplibre/maplibre-gl.js" asp-append-version="true"></script>
+    <script src="~/js/home-branch-map.js" asp-append-version="true"></script>
+}
