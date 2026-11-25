@@ -1,0 +1,12 @@
+/* MotionSites-inspired word reveal for the Branches page. Kept framework-free. */
+.branches-motion-text{--motion-word-delay:70ms;position:relative}
+.branches-motion-text .motion-word{display:inline-block;opacity:0;transform:translate3d(0,38px,0);filter:blur(10px);will-change:transform,opacity,filter;transition:opacity .42s ease,transform .68s cubic-bezier(.16,.84,.25,1),filter .52s ease;transition-delay:calc(var(--motion-word-index,0) * var(--motion-word-delay))}
+.branches-motion-text.is-motion-visible .motion-word{opacity:1;transform:translate3d(0,0,0);filter:blur(0)}
+.branches-page-hero .branches-motion-text .motion-word{transform:translate3d(0,48px,0) scale(.96)}
+.branches-page-hero .branches-motion-text.is-motion-visible .motion-word{transform:translate3d(0,0,0) scale(1)}
+.branches-motion-text:after{content:"";position:absolute;right:0;bottom:-15px;width:min(150px,28%);height:2px;border-radius:99px;background:linear-gradient(90deg,transparent,#e32448);transform:scaleX(0);transform-origin:right;opacity:0;transition:transform .85s cubic-bezier(.16,.84,.25,1) .35s,opacity .3s ease .35s}
+.branches-motion-text.is-motion-visible:after{transform:scaleX(1);opacity:.9}
+.branches-page-hero .branches-motion-text:after{background:linear-gradient(90deg,transparent,#fff,#e32448);box-shadow:0 0 18px rgba(227,36,72,.28)}
+
+@media(max-width:760px){.branches-motion-text .motion-word{transform:translate3d(0,26px,0);filter:blur(7px);transition-delay:calc(var(--motion-word-index,0) * 45ms)}.branches-page-hero .branches-motion-text .motion-word{transform:translate3d(0,32px,0) scale(.975)}.branches-motion-text:after{bottom:-10px}}
+@media(prefers-reduced-motion:reduce){.branches-motion-text .motion-word{opacity:1!important;transform:none!important;filter:none!important;transition:none!important}.branches-motion-text:after{transform:scaleX(1)!important;opacity:.7!important;transition:none!important}}
