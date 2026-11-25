@@ -1,0 +1,39 @@
+/* Global cinematic motion layer inspired by modern MotionSites-style reveals. */
+body.site-cinematic-ready{--cinematic-glow-x:72vw;--cinematic-glow-y:24vh;position:relative}
+body.site-cinematic-ready::before{content:"";position:fixed;z-index:42;left:var(--cinematic-glow-x);top:var(--cinematic-glow-y);width:min(36vw,520px);aspect-ratio:1;translate:-50% -50%;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(211,24,57,.105),rgba(227,36,72,.045) 34%,transparent 70%);filter:blur(18px);opacity:.78;mix-blend-mode:multiply;transition:opacity .35s;will-change:left,top}
+body.site-cinematic-ready main{isolation:isolate}
+
+/* Safe whole-title blur/mask reveal. Does not rewrite heading markup. */
+.site-motion-title{opacity:0;filter:blur(10px);transform:translate3d(0,34px,0) scale(.985);clip-path:inset(0 0 34% 0);will-change:transform,opacity,filter,clip-path;transition:opacity .52s ease,transform .82s cubic-bezier(.16,.84,.25,1),filter .62s ease,clip-path .76s cubic-bezier(.16,.84,.25,1);isolation:isolate}
+.site-motion-title.site-motion-visible{opacity:1;filter:blur(0);transform:translate3d(0,0,0) scale(1);clip-path:inset(0 0 0 0)}
+.site-motion-title::after{content:"";display:block;width:min(120px,24%);height:2px;margin-top:14px;margin-inline-start:auto;border-radius:99px;background:linear-gradient(90deg,transparent,rgba(211,24,57,.95));transform:scaleX(0);transform-origin:right;opacity:0;transition:transform .9s cubic-bezier(.16,.84,.25,1) .22s,opacity .25s ease .22s}
+.site-motion-title.site-motion-visible::after{transform:scaleX(1);opacity:.86}
+.page-hero .site-motion-title::after,.home-hero .site-motion-title::after,.franchise-hero .site-motion-title::after{background:linear-gradient(90deg,transparent,#fff,#e32448);box-shadow:0 0 18px rgba(227,36,72,.28)}
+
+/* Cinematic image wipe. Never overrides an existing absolute/sticky position. */
+.site-motion-media{overflow:hidden!important;isolation:isolate}
+.site-motion-media-positioned{position:relative!important}
+.site-motion-media>img{transform:scale(1.075);filter:saturate(.8) contrast(1.03);transition:transform 1.15s cubic-bezier(.16,.84,.25,1),filter .9s ease;will-change:transform,filter}
+.site-motion-media .site-motion-wipe{position:absolute;z-index:30;inset:-2px;background:linear-gradient(110deg,#711023 0%,#d31839 42%,#f24460 55%,#8d1026 100%);transform:translate3d(108%,0,0) skewX(-7deg);pointer-events:none;box-shadow:-22px 0 55px rgba(211,24,57,.28);will-change:transform}
+.site-motion-media.site-motion-media-ready .site-motion-wipe{animation:siteCinematicWipe 1.05s cubic-bezier(.76,0,.24,1) both}
+.site-motion-media.site-motion-media-ready>img{transform:scale(1);filter:saturate(1) contrast(1)}
+@keyframes siteCinematicWipe{0%{transform:translate3d(108%,0,0) skewX(-7deg)}46%{transform:translate3d(0,0,0) skewX(-7deg)}54%{transform:translate3d(0,0,0) skewX(0)}100%{transform:translate3d(-108%,0,0) skewX(7deg)}}
+
+/* Glass sweep uses a real child so component pseudo-elements keep working. */
+.site-motion-sheen{position:relative!important;isolation:isolate}
+.site-motion-sheen-layer{position:absolute;z-index:24;inset:-38% -58%;pointer-events:none;background:linear-gradient(112deg,transparent 36%,rgba(255,255,255,.21) 48%,rgba(255,255,255,.07) 54%,transparent 66%);transform:translate3d(72%,0,0) rotate(2deg);opacity:0;transition:transform .85s cubic-bezier(.2,.8,.2,1),opacity .25s;mix-blend-mode:screen}
+.site-motion-sheen:hover>.site-motion-sheen-layer{transform:translate3d(-72%,0,0) rotate(2deg);opacity:.72}
+
+/* A tiny travelling accent line for section containers. */
+.site-motion-section{position:relative;isolation:isolate}
+.site-motion-section>.site-motion-section-line{position:absolute;z-index:3;top:0;right:8%;width:min(160px,22vw);height:1px;pointer-events:none;background:linear-gradient(90deg,transparent,#d31839,#fff,transparent);box-shadow:0 0 14px rgba(211,24,57,.24);opacity:0;transform:translateX(60px) scaleX(.35);transform-origin:right;transition:opacity .45s,transform 1s cubic-bezier(.16,.84,.25,1)}
+.site-motion-section.site-motion-section-visible>.site-motion-section-line{opacity:.82;transform:translateX(0) scaleX(1)}
+
+@media(max-width:760px){body.site-cinematic-ready::before{width:72vw;opacity:.5;filter:blur(24px)}.site-motion-title{filter:blur(7px);transform:translate3d(0,24px,0) scale(.99)}.site-motion-title::after{margin-top:10px}.site-motion-media .site-motion-wipe{box-shadow:none}.site-motion-section>.site-motion-section-line{right:5%;width:100px}}
+@media(prefers-reduced-motion:reduce){body.site-cinematic-ready::before{display:none}.site-motion-title{opacity:1!important;filter:none!important;transform:none!important;clip-path:none!important;transition:none!important}.site-motion-title::after{transform:scaleX(1)!important;opacity:.65!important;transition:none!important}.site-motion-media>img{transform:none!important;filter:none!important;transition:none!important}.site-motion-media .site-motion-wipe{display:none!important}.site-motion-sheen-layer{display:none!important}.site-motion-section>.site-motion-section-line{opacity:.55!important;transform:none!important;transition:none!important}}
+
+
+/* Homepage floating product owns its own motion; never apply the global red wipe here. */
+.home-hero .hero-product-showcase.site-motion-media{overflow:visible!important}
+.home-hero .hero-product-showcase>.site-motion-wipe{display:none!important}
+.home-hero .hero-product-showcase.site-motion-media>img{transform-origin:50% 54%}
