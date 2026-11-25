@@ -1,0 +1,78 @@
+@page
+@model NavidGelato_Site.Pages.Admin.ContactErrorsModel
+@using NavidGelato_Site.Security
+@inject IAdminPermissionService PermissionService
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "خطاهای ارسال درخواست";
+    var canDelete = await PermissionService.HasAsync(User, AdminPermissions.ContactErrors.Delete);
+}
+
+<div class="admin-page-head">
+    <div><span>گزارش خطا</span><h1>خطاهای ارسال فرم ارتباط</h1></div>
+    @if (canDelete && Model.Items.Count > 0)
+    {
+        <form method="post" asp-page-handler="Clear" onsubmit="return confirm('همه خطاهای ثبت‌شده پاک شوند؟')">
+            <button class="admin-secondary" type="submit">پاک کردن همه</button>
+        </form>
+    }
+</div>
+
+<div class="admin-panel">
+    <div class="error-log-summary"><b>@Model.Items.Count</b><span>خطای اخیر</span><small>حداکثر ۲۵۰ مورد آخر نمایش داده می‌شود.</small></div>
+    @if (Model.Items.Count == 0)
+    {
+        <p class="muted-text">فعلاً خطای ثبت‌شده‌ای برای ارسال فرم ارتباط وجود ندارد.</p>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table error-log-table">
+                <thead><tr><th>زمان</th><th>فرستنده</th><th>خطا</th><th>جزئیات</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td class="nowrap">@Model.FormatOccurredAt(item.OccurredAtUtc)</td>
+                        <td><b>@item.RequestName</b>@if (!string.IsNullOrWhiteSpace(item.RequestMobile)){<small dir="ltr">@item.RequestMobile</small>}</td>
+                        <td><b>@item.ErrorMessage</b><small dir="ltr">@item.ExceptionType</small></td>
+                        <td>
+                            <details class="error-log-details">
+                                <summary>مشاهده جزئیات</summary>
+                                <div class="error-log-detail-grid">
+                                    <div><span>متن درخواست ناموفق</span><p>@item.RequestMessage</p></div>
+                                    <div><span>مسیر</span><code dir="ltr">@item.RequestPath</code></div>
+                                    @if (!string.IsNullOrWhiteSpace(item.IntendedSmsText))
+                                    {
+                                        <div class="wide sms-preview">
+                                            <span>متن پیامکی که قرار بود ارسال شود</span>
+                                            <pre dir="rtl">@item.IntendedSmsText</pre>
+                                            <small>ارسال واقعی انجام نشده است. این متن فقط پیش‌نمایش خروجی نهایی پس از اعمال فیلتر محتواست.</small>
+                                        </div>
+                                    }
+                                    <div class="wide"><span>جزئیات فنی</span><pre dir="ltr">@item.TechnicalDetails</pre></div>
+                                </div>
+                            </details>
+                        </td>
+                        <td>
+                            @if (canDelete)
+                            {
+                                <form method="post" asp-page-handler="Delete" onsubmit="return confirm('این خطا حذف شود؟')">
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <button class="text-danger" type="submit">حذف</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@section Head {
+<style>
+.error-log-summary{display:flex;align-items:baseline;gap:8px;margin-bottom:18px}.error-log-summary b{font-size:28px;color:#ff5968}.error-log-summary span{font-weight:800}.error-log-summary small{color:#777780;margin-right:auto}.error-log-table td{vertical-align:top}.error-log-table td>small{display:block;color:#777780;margin-top:5px}.nowrap{white-space:nowrap}.error-log-details summary{cursor:pointer;color:#ff5968;font-weight:700;font-size:12px}.error-log-detail-grid{width:min(760px,70vw);display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#0e0e10;border:1px solid #303036;border-radius:12px;padding:12px;margin-top:10px}.error-log-detail-grid>div{display:grid;gap:5px}.error-log-detail-grid .wide{grid-column:1/-1}.error-log-detail-grid span{font-size:10px;color:#777780}.error-log-detail-grid p{margin:0;white-space:pre-wrap}.error-log-detail-grid code,.error-log-detail-grid pre{margin:0;background:#09090a;border:1px solid #252529;border-radius:8px;padding:9px;color:#ffb4bb;white-space:pre-wrap;word-break:break-word;max-height:260px;overflow:auto;font-size:11px}.error-log-detail-grid .sms-preview{border:1px solid #51441f;background:#17150d;border-radius:10px;padding:11px}.error-log-detail-grid .sms-preview span{color:#f0cf69;font-weight:800}.error-log-detail-grid .sms-preview pre{direction:rtl;text-align:right;color:#f5f5f6;background:#101012}.error-log-detail-grid .sms-preview small{color:#9d936d;line-height:1.8}@@media(max-width:760px){.error-log-summary{align-items:flex-start;flex-wrap:wrap}.error-log-summary small{width:100%;margin:0}.error-log-detail-grid{width:75vw;grid-template-columns:1fr}.error-log-detail-grid .wide{grid-column:auto}}
+</style>
+}

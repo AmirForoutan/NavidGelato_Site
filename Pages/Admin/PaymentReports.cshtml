@@ -1,0 +1,343 @@
+@page
+@model NavidGelato_Site.Pages.Admin.PaymentReportsModel
+@using NavidGelato_Site.Models
+@using NavidGelato_Site.Security
+@inject IAdminPermissionService PermissionService
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "گزارش پرداخت‌ها";
+    var canDetails = await PermissionService.HasAsync(User, AdminPermissions.PaymentReports.ViewDetails);
+    var canExport = await PermissionService.HasAsync(User, AdminPermissions.PaymentReports.Export);
+}
+
+<div class="admin-page-head payment-report-head">
+    <div>
+        <span>گزارش مالی</span>
+        <h1>درخواست‌ها و پرداخت‌های آنلاین</h1>
+        <p>وضعیت لینک‌های ساخته‌شده، پرداخت‌های موفق، خطاها، انقضاها و پاسخ درگاه را بدون مراجعه به SQL بررسی کنید.</p>
+    </div>
+    @if (canExport)
+    {
+        <a class="admin-secondary payment-export-btn" href="@Model.BuildExportUrl()">خروجی Excel از فیلتر فعلی</a>
+    }
+</div>
+
+<form method="get" class="admin-panel payment-filter">
+    <div class="payment-filter-grid">
+        <label>
+            از تاریخ
+            <input asp-for="Filter.DateFrom" data-jdp autocomplete="off" dir="ltr" />
+        </label>
+        <label>
+            تا تاریخ
+            <input asp-for="Filter.DateTo" data-jdp autocomplete="off" dir="ltr" />
+        </label>
+        <label>
+            شعبه
+            <select asp-for="Filter.BranchId">
+                <option value="">همه شعب</option>
+                @foreach (var branch in Model.Branches)
+                {
+                    <option value="@branch.Id">@branch.Name</option>
+                }
+            </select>
+        </label>
+        <label>
+            وضعیت
+            <select asp-for="Filter.Status">
+                <option value="">همه وضعیت‌ها</option>
+                <option value="@((int)PaymentLinkStatus.Created)">باز نشده</option>
+                <option value="@((int)PaymentLinkStatus.Opened)">در حال اتصال به درگاه</option>
+                <option value="@((int)PaymentLinkStatus.GatewayReady)">در انتظار پرداخت</option>
+                <option value="@((int)PaymentLinkStatus.VerificationPending)">در انتظار تایید بانک</option>
+                <option value="@((int)PaymentLinkStatus.Paid)">پرداخت موفق</option>
+                <option value="@((int)PaymentLinkStatus.Failed)">ناموفق</option>
+                <option value="@((int)PaymentLinkStatus.Expired)">منقضی</option>
+            </select>
+        </label>
+        <label>
+            وضعیت باز شدن لینک
+            <select asp-for="Filter.Opened">
+                <option value="">همه</option>
+                <option value="true">باز شده</option>
+                <option value="false">باز نشده</option>
+            </select>
+        </label>
+        <label class="payment-search-field">
+            جستجو
+            <input asp-for="Filter.Search" placeholder="Id، PaymentKey، ResNum، RefNum، TraceNo، موبایل، شبا یا شعبه" />
+        </label>
+        <label>
+            تعداد در صفحه
+            <select asp-for="Filter.PageSize">
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </label>
+    </div>
+    <input type="hidden" name="Filter.PageNumber" value="1" />
+    <div class="payment-filter-actions">
+        <button class="admin-primary" type="submit">اعمال فیلتر</button>
+        <a class="admin-secondary" asp-page="/Admin/PaymentReports">امروز / پاک کردن فیلتر</a>
+    </div>
+    <div asp-validation-summary="All" class="validation-summary"></div>
+</form>
+
+<div class="payment-stats-grid">
+    <article><span>کل درخواست‌ها</span><b>@Model.Summary.TotalRequests.ToString("N0")</b><small>در بازه انتخاب‌شده</small></article>
+    <article><span>مبلغ کل درخواست‌ها</span><b>@Model.Summary.TotalAmount.ToString("N0")</b><small>ریال</small></article>
+    <article class="success"><span>پرداخت موفق</span><b>@Model.Summary.PaidCount.ToString("N0")</b><small>@Model.Summary.PaidAmount.ToString("N0") ریال</small></article>
+    <article><span>نرخ موفقیت</span><b>@Model.Summary.SuccessRate.ToString("0.0")%</b><small>نسبت به کل درخواست‌ها</small></article>
+    <article class="danger"><span>ناموفق</span><b>@Model.Summary.FailedCount.ToString("N0")</b><small>Callback یا Verify ناموفق</small></article>
+    <article class="warning"><span>منقضی</span><b>@Model.Summary.ExpiredCount.ToString("N0")</b><small>مهلت پرداخت تمام شده</small></article>
+    <article><span>باز نشده</span><b>@Model.Summary.UnopenedCount.ToString("N0")</b><small>لینک هنوز توسط مشتری باز نشده</small></article>
+    <article><span>در جریان</span><b>@Model.Summary.PendingCount.ToString("N0")</b><small>هنوز به نتیجه نهایی نرسیده</small></article>
+    <article><span>لینک‌های بازشده</span><b>@Model.Summary.OpenedCount.ToString("N0")</b><small>حداقل یک‌بار توسط مشتری باز شده</small></article>
+    <article class="warning"><span>در انتظار تایید بانک</span><b>@Model.Summary.VerifyingCount.ToString("N0")</b><small>نیازمند توجه در صورت ماندگاری</small></article>
+</div>
+
+<div class="admin-panel payment-report-panel">
+    <div class="payment-report-toolbar">
+        <div>
+            <h2>تراکنش‌ها و درخواست‌ها</h2>
+            <small>@Model.TotalRows.ToString("N0") رکورد مطابق فیلتر</small>
+        </div>
+        <div class="payment-report-legend">
+            <span><i class="paid"></i> موفق</span>
+            <span><i class="pending"></i> در جریان</span>
+            <span><i class="failed"></i> ناموفق/منقضی</span>
+        </div>
+    </div>
+
+    @if (Model.Items.Count == 0)
+    {
+        <div class="payment-empty">
+            <b>رکوردی پیدا نشد.</b>
+            <span>بازه تاریخ یا فیلترها را تغییر دهید.</span>
+        </div>
+    }
+    else
+    {
+        <div class="admin-table-wrap">
+            <table class="admin-table payment-report-table">
+                <thead>
+                    <tr>
+                        <th>زمان درخواست</th>
+                        <th>شعبه</th>
+                        <th>شناسه لینک</th>
+                        <th>مبلغ</th>
+                        <th>وضعیت</th>
+                        <th>باز شدن / پرداخت</th>
+                        <th>موبایل</th>
+                        @if (canDetails)
+                        {
+                            <th>جزئیات</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    var effectiveStatus = Model.GetEffectiveStatus(item);
+                    <tr>
+                        <td class="nowrap">@Model.FormatDateTime(item.CreatedAtUtc)</td>
+                        <td><b>@item.BranchName</b><small>#@item.BranchId</small></td>
+                        <td>
+                            <code dir="ltr">@Model.ShortPaymentKey(item.PublicToken)</code>
+                            <small dir="ltr">@item.ResNum</small>
+                        </td>
+                        <td class="nowrap"><b>@item.Amount.ToString("N0")</b><small> ریال</small></td>
+                        <td><span class="status @NavidGelato_Site.Pages.Admin.PaymentReportsModel.GetStatusCss(effectiveStatus)">@NavidGelato_Site.Pages.Admin.PaymentReportsModel.GetStatusTitle(effectiveStatus)</span></td>
+                        <td>
+                            <div class="payment-time-stack">
+                                <span>باز: @Model.FormatDateTime(item.OpenedAtUtc)</span>
+                                <span>پرداخت: @Model.FormatDateTime(item.PaidAtUtc)</span>
+                                @if (item.ExpiresAtUtc.HasValue && effectiveStatus != PaymentLinkStatus.Paid)
+                                {
+                                    <span>انقضا: @Model.FormatDateTime(item.ExpiresAtUtc)</span>
+                                }
+                            </div>
+                        </td>
+                        <td dir="ltr">@(string.IsNullOrWhiteSpace(item.CellNumber) ? "-" : item.CellNumber)</td>
+                        @if (canDetails)
+                        {
+                            <td>
+                                <button class="payment-detail-open"
+                                        type="button"
+                                        data-payment-modal-open="payment-modal-@item.Id">
+                                    مشاهده جزئیات
+                                </button>
+                            </td>
+                        }
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <nav class="payment-pagination" aria-label="صفحه‌بندی گزارش">
+                @if (Model.Filter.PageNumber > 1)
+                {
+                    <a href="@Model.BuildPageUrl(Model.Filter.PageNumber - 1)">قبلی</a>
+                }
+
+                <span>صفحه @Model.Filter.PageNumber.ToString("N0") از @Model.TotalPages.ToString("N0")</span>
+
+                @if (Model.Filter.PageNumber < Model.TotalPages)
+                {
+                    <a href="@Model.BuildPageUrl(Model.Filter.PageNumber + 1)">بعدی</a>
+                }
+            </nav>
+        }
+
+        @if (canDetails)
+        {
+            @foreach (var item in Model.Items)
+            {
+                var modalStatus = Model.GetEffectiveStatus(item);
+                <div class="payment-modal" id="payment-modal-@item.Id" data-payment-modal hidden aria-hidden="true">
+                    <div class="payment-modal-backdrop" data-payment-modal-close></div>
+                    <section class="payment-modal-dialog"
+                             role="dialog"
+                             aria-modal="true"
+                             aria-labelledby="payment-modal-title-@item.Id">
+                        <header class="payment-modal-head">
+                            <div>
+                                <span>جزئیات تراکنش #@item.Id</span>
+                                <h2 id="payment-modal-title-@item.Id">@item.BranchName</h2>
+                                <div class="payment-modal-head-meta">
+                                    <span class="status @NavidGelato_Site.Pages.Admin.PaymentReportsModel.GetStatusCss(modalStatus)">
+                                        @NavidGelato_Site.Pages.Admin.PaymentReportsModel.GetStatusTitle(modalStatus)
+                                    </span>
+                                    <b>@item.Amount.ToString("N0") ریال</b>
+                                </div>
+                            </div>
+                            <button type="button" class="payment-modal-close" data-payment-modal-close aria-label="بستن">×</button>
+                        </header>
+
+                        <div class="payment-modal-body">
+                            <section class="payment-modal-section">
+                                <div class="payment-modal-section-head">
+                                    <span>شناسه‌ها</span>
+                                    <h3>اطلاعات تراکنش و درگاه</h3>
+                                </div>
+                                <div class="payment-modal-grid">
+                                    <div class="wide"><span>Payment Key</span><code dir="ltr">@item.PublicToken</code></div>
+                                    <div><span>ResNum</span><code dir="ltr">@item.ResNum</code></div>
+                                    <div><span>RefNum</span><code dir="ltr">@(item.RefNum ?? "-")</code></div>
+                                    <div><span>TraceNo</span><code dir="ltr">@(item.TraceNo ?? "-")</code></div>
+                                    <div><span>Gateway Request Id</span><code dir="ltr">@(item.GatewayRequestId ?? "-")</code></div>
+                                </div>
+                            </section>
+
+                            <section class="payment-modal-section">
+                                <div class="payment-modal-section-head">
+                                    <span>مالی</span>
+                                    <h3>مبلغ و تسویه</h3>
+                                </div>
+                                <div class="payment-modal-grid">
+                                    <div><span>مبلغ درخواستی</span><b>@item.Amount.ToString("N0") ریال</b></div>
+                                    <div><span>مبلغ تاییدشده بانک</span><b>@(item.VerifiedAmount.HasValue ? $"{item.VerifiedAmount.Value:N0} ریال" : "-")</b></div>
+                                    <div class="wide"><span>شبای Snapshot تسویه</span><code dir="ltr">@item.SettlementIban</code></div>
+                                    <div><span>شماره موبایل</span><b dir="ltr">@(item.CellNumber ?? "-")</b></div>
+                                    <div><span>Token درگاه دریافت شده؟</span><b>@(item.HasGatewayToken ? "بله" : "خیر")</b></div>
+                                </div>
+                            </section>
+
+                            <section class="payment-modal-section">
+                                <div class="payment-modal-section-head">
+                                    <span>زمان‌بندی</span>
+                                    <h3>چرخه لینک پرداخت</h3>
+                                </div>
+                                <div class="payment-modal-grid">
+                                    <div><span>ساخت درخواست</span><b>@Model.FormatDateTime(item.CreatedAtUtc)</b></div>
+                                    <div><span>اولین باز شدن</span><b>@Model.FormatDateTime(item.OpenedAtUtc)</b></div>
+                                    <div><span>زمان انقضا</span><b>@Model.FormatDateTime(item.ExpiresAtUtc)</b></div>
+                                    <div><span>زمان پرداخت موفق</span><b>@Model.FormatDateTime(item.PaidAtUtc)</b></div>
+                                    <div><span>آخرین Callback</span><b>@Model.FormatDateTime(item.LastCallbackAtUtc)</b></div>
+                                    <div><span>شروع درخواست Token</span><b>@Model.FormatDateTime(item.GatewayRequestStartedAtUtc)</b></div>
+                                </div>
+                            </section>
+
+                            <section class="payment-modal-section payment-modal-error-section">
+                                <div class="payment-modal-section-head">
+                                    <span>خطا / توضیح</span>
+                                    <h3>آخرین وضعیت ثبت‌شده</h3>
+                                </div>
+                                <pre>@(string.IsNullOrWhiteSpace(item.FailureMessage) ? "خطایی برای این تراکنش ثبت نشده است." : item.FailureMessage)</pre>
+                            </section>
+                        </div>
+                    </section>
+                </div>
+            }
+        }
+    }
+</div>
+
+@section Head {
+    <link rel="stylesheet" href="https://unpkg.com/@@majidh1/jalalidatepicker/dist/jalalidatepicker.min.css" />
+    <style>
+        .payment-report-head{align-items:flex-end}.payment-report-head p{margin:7px 0 0;color:#777780;font-size:12px;line-height:1.9}.payment-export-btn{display:inline-flex;align-items:center}
+        .payment-filter{margin-bottom:18px}.payment-filter-grid{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:10px}.payment-filter label{display:grid;gap:7px;color:#aaaab2;font-size:11px}.payment-filter input,.payment-filter select{width:100%;border:1px solid #34343a;background:#0f0f11;color:#fff;border-radius:10px;padding:10px 11px;outline:none}.payment-filter input:focus,.payment-filter select:focus{border-color:#e8192c}.payment-search-field{grid-column:span 2}.payment-filter-actions{display:flex;gap:9px;margin-top:13px;flex-wrap:wrap}
+        .payment-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}.payment-stats-grid article{background:#151518;border:1px solid #29292e;border-radius:14px;padding:16px;display:grid;gap:6px}.payment-stats-grid span{color:#898992;font-size:11px}.payment-stats-grid b{font-size:25px}.payment-stats-grid small{color:#686870}.payment-stats-grid article.success{border-color:#214b39}.payment-stats-grid article.success b{color:#72e8b1}.payment-stats-grid article.danger{border-color:#54242b}.payment-stats-grid article.danger b{color:#ff8792}.payment-stats-grid article.warning{border-color:#51441f}.payment-stats-grid article.warning b{color:#f0cf69}
+        .payment-report-toolbar{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin-bottom:15px}.payment-report-toolbar h2{margin:0!important}.payment-report-toolbar small{color:#777780}.payment-report-legend{display:flex;gap:13px;flex-wrap:wrap;color:#85858d;font-size:10px}.payment-report-legend span{display:flex;align-items:center;gap:5px}.payment-report-legend i{width:7px;height:7px;border-radius:50%}.payment-report-legend i.paid{background:#72e8b1}.payment-report-legend i.pending{background:#f0cf69}.payment-report-legend i.failed{background:#ff8792}
+        .payment-report-panel{padding:24px 12px}.payment-report-toolbar{padding:0 8px}.payment-report-panel>.admin-table-wrap{margin:0 -4px}.payment-report-table{min-width:1460px}.payment-report-table th,.payment-report-table td{padding:16px 14px}.payment-report-table th{font-size:12px}.payment-report-table td{vertical-align:middle;font-size:12px}.payment-report-table td>small,.payment-report-table td code+small{display:block;color:#74747d;margin-top:6px;font-size:10px}.payment-report-table code{font-size:11px;color:#ff9aa3}.payment-time-stack{display:grid;gap:5px;color:#a4a4ad;font-size:11px;min-width:190px}.nowrap{white-space:nowrap}
+        .payment-detail-open{border:1px solid #493036;background:#251419;color:#ff8792;padding:8px 12px;border-radius:9px;cursor:pointer;white-space:nowrap;font-weight:700;font-size:11px;transition:.18s}.payment-detail-open:hover{background:#e8192c;border-color:#e8192c;color:#fff}
+        body.payment-modal-open{overflow:hidden}.payment-modal[hidden]{display:none!important}.payment-modal{position:fixed;inset:0;z-index:6000;display:grid;place-items:center;padding:28px}.payment-modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.76);backdrop-filter:blur(8px)}.payment-modal-dialog{position:relative;z-index:1;width:min(1050px,calc(100vw - 44px));max-height:90vh;overflow:hidden;display:flex;flex-direction:column;background:#131316;border:1px solid #3a3a41;border-radius:22px;box-shadow:0 40px 140px rgba(0,0,0,.78);animation:paymentModalIn .18s ease-out}.payment-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:22px 24px 18px;border-bottom:1px solid #2b2b31;background:#17171b}.payment-modal-head>div{display:grid;gap:5px}.payment-modal-head>div>span{color:#e8192c;font-size:10px}.payment-modal-head h2{margin:0;font-size:22px}.payment-modal-head-meta{display:flex;align-items:center;gap:10px;margin-top:5px}.payment-modal-head-meta b{font-size:13px}.payment-modal-close{width:42px;height:42px;display:grid;place-items:center;flex:0 0 42px;border:1px solid #38383e;border-radius:50%;background:#202024;color:#fff;font-size:25px;line-height:1;cursor:pointer}.payment-modal-close:hover{background:#e8192c;border-color:#e8192c}.payment-modal-body{overflow:auto;padding:22px 24px 26px;display:grid;gap:16px}.payment-modal-section{background:#0e0e11;border:1px solid #29292f;border-radius:15px;padding:16px}.payment-modal-section-head{margin-bottom:13px}.payment-modal-section-head span{display:block;color:#e8192c;font-size:9px;margin-bottom:4px}.payment-modal-section-head h3{margin:0;font-size:14px}.payment-modal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.payment-modal-grid>div{min-width:0;display:grid;gap:6px;background:#121216;border:1px solid #27272c;border-radius:10px;padding:11px}.payment-modal-grid>div.wide{grid-column:1/-1}.payment-modal-grid span{font-size:9px;color:#777780}.payment-modal-grid b{font-size:12px}.payment-modal-grid code{display:block;direction:ltr;text-align:left;white-space:pre-wrap;word-break:break-all;color:#ffabb4;font-size:11px}.payment-modal-error-section pre{margin:0;min-height:58px;max-height:190px;overflow:auto;white-space:pre-wrap;word-break:break-word;background:#121216;border:1px solid #2b2b31;border-radius:10px;padding:12px;color:#bbb;line-height:1.9;font-size:11px}@@keyframes paymentModalIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+        .payment-empty{padding:45px 15px;text-align:center;display:grid;gap:7px}.payment-empty span{color:#777780;font-size:11px}.payment-pagination{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:18px}.payment-pagination a{background:#242429;border:1px solid #34343a;padding:8px 13px;border-radius:9px;color:#fff}.payment-pagination span{color:#85858d;font-size:11px}
+        @@media(max-width:1100px){.payment-filter-grid{grid-template-columns:repeat(2,1fr)}.payment-stats-grid{grid-template-columns:repeat(2,1fr)}}@@media(max-width:650px){.payment-report-head{align-items:flex-start;flex-direction:column}.payment-filter-grid{grid-template-columns:1fr}.payment-search-field{grid-column:auto}.payment-stats-grid{grid-template-columns:1fr 1fr}.payment-report-toolbar{flex-direction:column}.payment-stats-grid b{font-size:20px}.payment-modal{padding:10px}.payment-modal-dialog{width:100%;max-height:calc(100dvh - 20px);border-radius:17px}.payment-modal-head{padding:17px}.payment-modal-head h2{font-size:18px}.payment-modal-body{padding:15px}.payment-modal-grid{grid-template-columns:1fr}.payment-modal-grid>div.wide{grid-column:auto}}
+    </style>
+}
+
+@section Scripts {
+    <script src="https://unpkg.com/@@majidh1/jalalidatepicker/dist/jalalidatepicker.min.js"></script>
+    <script>
+        if (window.jalaliDatepicker) {
+            jalaliDatepicker.startWatch({
+                selector: 'input[data-jdp]',
+                date: true,
+                time: false,
+                persianDigits: false,
+                showTodayBtn: true,
+                showEmptyBtn: true,
+                showCloseBtn: true,
+                zIndex: 4000
+            });
+        }
+
+        (() => {
+            const closeModal = (modal) => {
+                if (!modal) return;
+                modal.hidden = true;
+                modal.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('payment-modal-open');
+            };
+
+            document.querySelectorAll('[data-payment-modal-open]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const id = button.getAttribute('data-payment-modal-open');
+                    const modal = id ? document.getElementById(id) : null;
+                    if (!modal) return;
+
+                    modal.hidden = false;
+                    modal.setAttribute('aria-hidden', 'false');
+                    document.body.classList.add('payment-modal-open');
+                    modal.querySelector('.payment-modal-close')?.focus();
+                });
+            });
+
+            document.querySelectorAll('[data-payment-modal-close]').forEach((button) => {
+                button.addEventListener('click', () => closeModal(button.closest('[data-payment-modal]')));
+            });
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key !== 'Escape') return;
+                const modal = document.querySelector('[data-payment-modal]:not([hidden])');
+                closeModal(modal);
+            });
+        })();
+    </script>
+}

@@ -1,0 +1,145 @@
+@page
+@model NavidGelato_Site.Pages.Admin.ProductsModel
+@using NavidGelato_Site.Security
+@inject IAdminPermissionService PermissionService
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "کالاها";
+    var canCreate = await PermissionService.HasAsync(User, AdminPermissions.Products.Create);
+    var canEdit = await PermissionService.HasAsync(User, AdminPermissions.Products.Edit);
+    var canDelete = await PermissionService.HasAsync(User, AdminPermissions.Products.Delete);
+    var canImages = await PermissionService.HasAsync(User, AdminPermissions.Products.ManageImages);
+    var pageUrl = Url.Page("/Admin/Products") ?? string.Empty;
+}
+<div class="admin-page-head">
+    <div><span>منوی دیجیتال</span><h1>مدیریت کالاها</h1></div>
+    @if (canCreate)
+    {
+        <button class="admin-primary link-btn" type="button" data-product-new>کالای جدید</button>
+    }
+</div>
+
+<div class="admin-panel product-datatable-panel"
+     data-products-root
+     data-page-url="@pageUrl"
+     data-can-create="@canCreate.ToString().ToLowerInvariant()"
+     data-can-edit="@canEdit.ToString().ToLowerInvariant()"
+     data-can-delete="@canDelete.ToString().ToLowerInvariant()"
+     data-can-images="@canImages.ToString().ToLowerInvariant()">
+    <div class="product-table-intro">
+        <div>
+            <h2>لیست کالاها</h2>
+            <p>جستجو، مرتب‌سازی، ویرایش و مدیریت تصاویر بدون خروج از همین صفحه.</p>
+        </div>
+        <span class="product-table-status" data-products-status>در حال بارگذاری…</span>
+    </div>
+
+    <div class="admin-table-wrap product-datatable-wrap">
+        <table id="products-datatable" class="admin-table product-datatable" style="width:100%">
+            <thead>
+            <tr>
+                <th>تصویر</th>
+                <th>کد کالا</th>
+                <th>نام کالا</th>
+                <th>دسته‌بندی</th>
+                <th>قیمت</th>
+                <th>ترتیب</th>
+                <th>وضعیت</th>
+                <th>تصاویر</th>
+                <th>عملیات</th>
+                <th>توضیحات</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<div class="product-ajax-backdrop" data-product-backdrop hidden></div>
+<section class="product-ajax-modal" data-product-modal hidden aria-modal="true" role="dialog" aria-labelledby="product-modal-title">
+    <div class="product-ajax-modal-head">
+        <div>
+            <span>PRODUCT EDITOR</span>
+            <h2 id="product-modal-title" data-product-modal-title>کالای جدید</h2>
+        </div>
+        <button type="button" class="admin-editor-close" data-product-close aria-label="بستن">×</button>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="admin-form product-ajax-form" data-product-form>
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Form.Id" value="0" data-field="id" />
+
+        <div class="form-row">
+            <label>
+                کد کالا
+                <input name="Form.ProductCode" type="number" min="1" inputmode="numeric" dir="ltr" data-field="productCode" placeholder="مثلاً 1001" required />
+            </label>
+            <label>
+                نام کالا
+                <input name="Form.Name" maxlength="180" data-field="name" />
+            </label>
+            <label>
+                دسته‌بندی
+                <select name="Form.MenuCategoryId" data-field="menuCategoryId">
+                    <option value="">انتخاب دسته‌بندی</option>
+                    @foreach (var option in Model.CategoryOptions)
+                    {
+                        <option value="@option.Value">@option.Text</option>
+                    }
+                </select>
+            </label>
+        </div>
+
+        <div class="form-row">
+            <label>
+                قیمت (تومان)
+                <input name="Form.Price" type="number" min="0" inputmode="numeric" dir="ltr" data-field="price" />
+            </label>
+            <label>
+                ترتیب نمایش
+                <input name="Form.SortOrder" type="number" inputmode="numeric" dir="ltr" data-field="sortOrder" />
+            </label>
+            <div class="product-switches">
+                <label class="switch-label"><input name="Form.IsFeatured" value="true" type="checkbox" data-field="isFeatured" /> پیشنهادی</label>
+                <label class="switch-label"><input name="Form.IsActive" value="true" type="checkbox" data-field="isActive" checked /> فعال</label>
+            </div>
+        </div>
+
+        <label>
+            توضیحات
+            <textarea name="Form.Description" rows="4" maxlength="1000" data-field="description"></textarea>
+        </label>
+
+        @if (canImages)
+        {
+            <label>
+                افزودن تصاویر
+                <input name="Form.NewImages" type="file" accept="image/*" multiple data-field="newImages" />
+            </label>
+        }
+
+        <div class="product-ajax-errors" data-product-errors hidden></div>
+
+        <div class="product-form-actions">
+            <button type="button" class="admin-secondary" data-product-cancel>انصراف</button>
+            <button class="admin-primary" type="submit" data-product-submit>ذخیره کالا</button>
+        </div>
+    </form>
+
+    <div class="product-ajax-images" data-product-images hidden>
+        <div class="image-manager-head">
+            <div><h3>تصاویر کالا</h3><span data-product-image-count>0 تصویر</span></div>
+            <small>انتخاب تصویر اصلی یا حذف تصویر بدون رفرش صفحه.</small>
+        </div>
+        <div class="admin-image-grid" data-product-image-grid></div>
+    </div>
+</section>
+
+@section Head {
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.min.css" />
+    <link rel="stylesheet" href="~/css/admin-products.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+    <script src="~/js/admin-products.js" asp-append-version="true"></script>
+}

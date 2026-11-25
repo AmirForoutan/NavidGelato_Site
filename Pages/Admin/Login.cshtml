@@ -1,0 +1,38 @@
+@page
+@model NavidGelato_Site.Pages.Admin.LoginModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>ورود مدیریت نوید ژلاتو</title>
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+</head>
+<body class="admin-login-body">
+    <main class="login-card">
+        <div class="login-brand"><span>NP</span><div><b>Navid Pro</b><small>مدیریت سایت</small></div></div>
+        <h1>ورود به پنل مدیریت</h1>
+        <p>نام کاربری، رمز عبور و کد امنیتی را وارد کنید.</p>
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+            <label>نام کاربری<input asp-for="Input.UserName" autocomplete="username" /></label>
+            <label>رمز عبور<input asp-for="Input.Password" type="password" autocomplete="current-password" /></label>
+            <label>کد امنیتی
+                <div class="captcha-row"><strong>@Model.CaptchaQuestion</strong><input asp-for="Input.CaptchaAnswer" inputmode="numeric" autocomplete="off" /></div>
+            </label>
+            <button class="admin-primary" type="submit">ورود به مدیریت</button>
+        </form>
+        <a class="back-link" href="/">بازگشت به سایت</a>
+    </main>
+
+    @if (Model.LockoutEnd.HasValue)
+    {
+        <span hidden data-lockout-end="@Model.LockoutEnd.Value.ToUniversalTime().ToString("O")"></span>
+    }
+    <script src="~/js/admin-toasts.js" asp-append-version="true"></script>
+</body>
+</html>

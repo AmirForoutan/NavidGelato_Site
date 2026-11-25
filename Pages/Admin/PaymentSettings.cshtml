@@ -1,0 +1,76 @@
+@page
+@model NavidGelato_Site.Pages.Admin.PaymentSettingsModel
+@using NavidGelato_Site.Security
+@inject IAdminPermissionService PermissionService
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "تنظیمات درگاه پرداخت";
+    var canEdit = await PermissionService.HasAsync(User, AdminPermissions.Payments.Edit);
+}
+<div class="admin-page-head">
+    <div><span>پرداخت آنلاین</span><h1>تنظیمات درگاه سامان (SEP)</h1></div>
+</div>
+
+<div class="admin-panel narrow-panel site-settings-panel">
+    <div class="settings-section-head">
+        <div><span class="settings-icon">₽</span><div><h2>درگاه لینک پرداخت شعب</h2><p>تنظیمات دریافت توکن، هدایت مشتری، تایید تراکنش و تسویه روی شبای همان شعبه.</p></div></div>
+    </div>
+
+    @if (canEdit)
+    {
+        <form method="post" asp-page-handler="Save" class="admin-form">
+            <label class="switch-label"><input asp-for="Form.Enabled" type="checkbox" /> درگاه پرداخت فعال باشد</label>
+
+            <label>
+                شماره ترمینال
+                <input asp-for="Form.TerminalId" dir="ltr" autocomplete="off" placeholder="TerminalId" />
+            </label>
+
+            <label>
+                آدرس دریافت توکن
+                <input asp-for="Form.TokenUrl" dir="ltr" />
+                <small>پیش‌فرض SEP: https://sep.shaparak.ir/onlinepg/onlinepg</small>
+            </label>
+
+            <label>
+                آدرس هدایت به درگاه
+                <input asp-for="Form.PaymentUrlTemplate" dir="ltr" />
+                <small>برای جای توکن از <code>{token}</code> استفاده کنید. اگر وجود نداشته باشد، token به QueryString اضافه می‌شود.</small>
+            </label>
+
+            <label>
+                آدرس Verify
+                <input asp-for="Form.VerifyUrl" dir="ltr" />
+            </label>
+
+            <label>
+                آدرس عمومی سایت
+                <input asp-for="Form.PublicBaseUrl" dir="ltr" placeholder="https://navidgelato.example" />
+                <small>اختیاری. اگر سایت پشت CDN/Proxy است، بهتر است آدرس عمومی واقعی سایت را وارد کنید تا Callback و لینک پرداخت دقیق ساخته شوند.</small>
+            </label>
+
+            <label>
+                PurchaseId پیش‌فرض تسویه
+                <input asp-for="Form.DefaultPurchaseId" dir="ltr" maxlength="30" />
+                <small>برای تسویه عادی مقدار پیش‌فرض ۳۰ رقم صفر در نظر گرفته شده و در درخواست SettlementIbanInfo ارسال می‌شود.</small>
+            </label>
+
+            <div class="payment-settings-note">
+                در هر پرداخت فقط شبای شعبه درخواست‌کننده به <b>SettlementIbanInfo</b> فرستاده می‌شود و مبلغ همان لینک به همان شبا تخصیص می‌یابد.
+            </div>
+
+            <div asp-validation-summary="All" class="validation-summary"></div>
+            <button class="admin-primary" type="submit">ذخیره تنظیمات درگاه</button>
+        </form>
+    }
+    else
+    {
+        <p class="muted-text">دسترسی ویرایش تنظیمات درگاه برای شما فعال نیست.</p>
+    }
+</div>
+
+@section Head {
+<style>
+.payment-settings-note{padding:13px 15px;border:1px solid #3a3033;background:#181114;border-radius:12px;color:#aaaab2;font-size:11px;line-height:2}.payment-settings-note b{color:#ff7180}.admin-form code{direction:ltr;background:#202024;padding:2px 5px;border-radius:5px}
+</style>
+}

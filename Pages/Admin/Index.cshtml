@@ -1,0 +1,14 @@
+@page
+@model NavidGelato_Site.Pages.Admin.IndexModel
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "داشبورد";
+}
+<div class="admin-page-head"><div><span>نمای کلی</span><h1>داشبورد مدیریت</h1></div></div>
+<div class="stats-grid">
+    <article><span>کالاها</span><b>@Model.ProductCount</b><small>@Model.ActiveProductCount فعال</small></article>
+    <article><span>دسته‌بندی‌ها</span><b>@Model.CategoryCount</b><small>ساختار منوی دیجیتال</small></article>
+    <article><span>شعب</span><b>@Model.BranchCount</b><small>@Model.ActiveBranchCount قابل نمایش</small></article>
+    <article><span>تصاویر کالا</span><b>@Model.ImageCount</b><small>قابل مدیریت از کالاها</small></article>
+</div>
+<div class="admin-panel"><h2>دسترسی سریع</h2><div class="quick-actions"><a asp-page="/Admin/Products" asp-route-editId="0">افزودن کالا</a><a asp-page="/Admin/Branches" asp-route-editId="0">افزودن شعبه</a><a asp-page="/Admin/Categories">مدیریت دسته‌بندی</a><a asp-page="/Admin/SmsSettings">تنظیمات پیامک</a></div></div>
