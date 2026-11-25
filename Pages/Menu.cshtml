@@ -2,8 +2,8 @@
 @model MenuModel
 @using NavidGelato_Site.Services
 @{
-    ViewData["Title"] = "منوی دیجیتال نوید ژلاتو | ژلاتو، گرم و نوشیدنی";
-    ViewData["Description"] = "منوی دیجیتال نوید ژلاتو همراه دسته‌بندی ژلاتو، گرم، محصولات پرو و نوشیدنی‌ها با قیمت و تصویر.";
+    ViewData["Title"] = "منوی دیجیتال نوید ژلاتو | ژلاتو، دسر و نوشیدنی";
+    ViewData["Description"] = "منوی دیجیتال نوید ژلاتو همراه دسته‌بندی ژلاتو، دسر و نوشیدنی‌ها با قیمت و تصویر.";
     ViewData["Canonical"] = "https://navidgelato.example/menu";
     ViewData["OgImage"] = SiteContentService.ArcherImage;
     var fallbackImage = Url.Content(SiteContentService.LogoImage);
@@ -20,14 +20,14 @@
             <div class="menu-hero-product" aria-hidden="true">
                 <span class="menu-hero-product-ring"></span>
                 <img src="@Url.Content(SiteContentService.ArcherImage)" alt="" />
-                <span class="menu-hero-product-mark">NP</span>
+                <span class="menu-hero-product-mark">NG</span>
             </div>
         </div>
     </section>
 
     <section class="menu-experience-strip" aria-label="راهنمای منوی دیجیتال">
         <div class="container">
-            <div class="menu-experience-item" data-motion-reveal style="--motion-delay:0ms"><b>01</b><div><strong>دسته‌بندی رو انتخاب کن</strong><span>سریع بین سرد، گرم و بقیه منو حرکت کن.</span></div></div>
+            <div class="menu-experience-item" data-motion-reveal style="--motion-delay:0ms"><b>01</b><div><strong>دسته‌بندی رو انتخاب کن</strong><span>بین دسته‌بندی‌های منو جابه‌جا شو.</span></div></div>
             <div class="menu-experience-item" data-motion-reveal style="--motion-delay:100ms"><b>02</b><div><strong>تصاویر رو باز کن</strong><span>محصولاتی که گالری دارن رو از نزدیک ببین.</span></div></div>
             <div class="menu-experience-item" data-motion-reveal style="--motion-delay:200ms"><b>03</b><div><strong>طعم مورد علاقه‌ت رو پیدا کن</strong><span>اسم، ترکیب و قیمت کنار هم؛ بدون دردسر.</span></div></div>
         </div>

@@ -7,7 +7,7 @@
 @{
     ViewData["Title"] = "شعب نوید ژلاتو | آدرس، تلفن و مسیریابی مستقیم";
     ViewData["Description"] = "آدرس و تلفن شعب نوید ژلاتو در کرج، تهران، اهواز و شهرهای دیگر؛ پیدا کردن نزدیک‌ترین شعبه و مسیریابی با نقشه دستگاه، نشان، بلد، Waze و Google Maps.";
-    ViewData["Canonical"] = "https://navidgelato.example/branches";
+    ViewData["Canonical"] = "@($"{Request.Scheme}://{Request.Host}{Request.PathBase}/branches")";
     var now = IranClock.Now;
     var openBranches = Model.Branches.Where(x => x.Status == BranchStatus.Open || (x.Status == BranchStatus.OpeningSoon && x.OpeningDateTime.HasValue && x.OpeningDateTime.Value <= now)).ToList();
     var httpRequest = ViewContext.HttpContext.Request;
@@ -149,7 +149,7 @@
                         {
                                 @type = "Restaurant",
                                 name = $"نوید ژلاتو - {branch.Name}",
-                                url = $"https://navidgelato.example/branches#branch-{branch.Id}",
+                                url = $"@($"{Request.Scheme}://{Request.Host}{Request.PathBase}/branches#branch-"){branch.Id}",
                                 image = storeImageUrl,
                                 telephone = branch.Phones.OrderBy(x => x.SortOrder).FirstOrDefault()?.PhoneNumber,
                                 address = new { @type = "PostalAddress", streetAddress = branch.Address, addressLocality = branch.City, addressCountry = "IR" },

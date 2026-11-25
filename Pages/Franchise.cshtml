@@ -3,7 +3,7 @@
 @using NavidGelato_Site.Services
 @{
     ViewData["Title"] = "درخواست فرانچایز نوید ژلاتو | همکاری و راه‌اندازی شعبه";
-    ViewData["Description"] = "برای دریافت فرانچایز نوید ژلاتو، شرایط همکاری را بررسی کنید و از طریق تماس مستقیم یا فرم آنلاین درخواست خود را ثبت کنید.";
+    ViewData["Description"] = "برای دریافت فرانچایز نوید ژلاتو، شرایط همکاری را بررسی کنید و از طریق ارسال درخواست یا فرم آنلاین درخواست خود را ثبت کنید.";
     ViewData["Canonical"] = "https://navidgelato.example/franchise";
     ViewData["OgImage"] = SiteContentService.BrandBannerImage;
 }
@@ -27,10 +27,10 @@
                 <p>اگر برای راه‌اندازی یک کسب‌وکار غذایی جدی برنامه داری و دوست داری با یک برند، منو و هویت مشخص وارد بازار بشی، این صفحه برای شروع گفتگو ساخته شده.</p>
                 <div class="franchise-hero-actions">
                     <a class="btn btn-primary" href="#franchise-form">ثبت درخواست آنلاین <span>←</span></a>
-                    <a class="btn btn-ghost" href="tel:09122638537">تماس مستقیم: <b dir="ltr">0912 263 8537</b></a>
+                    <a class="btn btn-ghost" href="#franchise-form">ارتباط از طریق فرم درخواست</a>
                 </div>
                 <div class="franchise-hero-facts">
-                    <div><b>۲ مسیر</b><span>تماس مستقیم یا فرم آنلاین</span></div>
+                    <div><b>فرم آنلاین</b><span>ارسال درخواست یا فرم آنلاین</span></div>
                     <div><b>بررسی اولیه</b><span>بر اساس شهر، موقعیت و شرایط همکاری</span></div>
                     <div><b>شفاف</b><span>بدون وعده‌های تبلیغاتی مبهم</span></div>
                 </div>
@@ -50,15 +50,15 @@
             <div class="franchise-section-head" data-fr-reveal>
                 <span class="section-kicker">راه‌های شروع گفتگو</span>
                 <h2>دو راه ساده برای شروع.</h2>
-                <p>اگر سوال کوتاه و مشخصی داری، تماس مستقیم سریع‌تره. اگر می‌خوای اطلاعاتت ثبت بشه و تیم بررسی کنه، فرم آنلاین انتخاب بهتریه.</p>
+                <p>اگر سوال کوتاه و مشخصی داری، ارسال درخواست سریع‌تره. اگر می‌خوای اطلاعاتت ثبت بشه و تیم بررسی کنه، فرم آنلاین انتخاب بهتریه.</p>
             </div>
             <div class="franchise-path-grid">
                 <article class="franchise-path-card call" data-fr-card>
                     <span class="path-index">01</span>
                     <div class="path-icon">☎</div>
-                    <h3>تماس مستقیم</h3>
+                    <h3>ارسال درخواست</h3>
                     <p>برای صحبت اولیه درباره شهر، شرایط کلی همکاری و مسیر شروع، مستقیم تماس بگیر.</p>
-                    <a href="tel:09122638537"><span>تماس با نوید ژلاتو</span><b dir="ltr">09122638537</b></a>
+                    <a href="#franchise-form"><span>ارسال درخواست همکاری</span><b>ثبت فرم</b></a>
                 </article>
                 <article class="franchise-path-card form" data-fr-card>
                     <span class="path-index">02</span>
@@ -135,7 +135,7 @@
         <div class="container">
             <div class="franchise-section-head" data-fr-reveal><span class="section-kicker">روند بررسی</span><h2>از درخواست تا تصمیم همکاری.</h2></div>
             <div class="process-line">
-                <article data-fr-card><b>01</b><h3>ثبت درخواست</h3><p>تماس مستقیم یا فرم آنلاین.</p></article>
+                <article data-fr-card><b>01</b><h3>ثبت درخواست</h3><p>ارسال درخواست یا فرم آنلاین.</p></article>
                 <article data-fr-card><b>02</b><h3>بررسی اولیه</h3><p>شهر، محل احتمالی و شرایط کلی متقاضی بررسی می‌شود.</p></article>
                 <article data-fr-card><b>03</b><h3>گفتگوی تکمیلی</h3><p>جزئیات مدل همکاری، نیازها و انتظارات دو طرف شفاف می‌شود.</p></article>
                 <article data-fr-card><b>04</b><h3>ارزیابی و قرارداد</h3><p>در صورت توافق، شرایط نهایی در قرارداد رسمی مشخص می‌شود.</p></article>
@@ -149,7 +149,7 @@
                 <span class="section-kicker light">درخواست آنلاین فرانچایز</span>
                 <h2>اطلاعاتت رو بفرست،<br /><span>گفتگو از اینجا شروع میشه.</span></h2>
                 <p>شماره تماس برای پیگیری ضروریه. محل پیشنهادی و توضیحات اختیاری هستن و اگر هنوز تصمیم قطعی نگرفتی، می‌تونی خالی بذاری.</p>
-                <div class="form-direct-call"><span>برای تماس مستقیم</span><a href="tel:09122638537" dir="ltr">0912 263 8537</a></div>
+                <div class="form-direct-call"><span>برای ارسال درخواست</span><a href="#franchise-form">ثبت درخواست آنلاین</a></div>
             </div>
             <div class="franchise-form-card" data-fr-reveal data-fr-spotlight>
                 <form method="post" class="franchise-form">

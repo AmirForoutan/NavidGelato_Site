@@ -46,3 +46,5 @@ body{background:#fff8f1;color:#593b48;font-family:Tahoma,Arial,sans-serif}
 @keyframes gelatoFloat{50%{transform:rotate(-3deg) translateY(-16px)}}
 @media(max-width:850px){.gelato-hero-grid,.gelato-story-grid{grid-template-columns:1fr}.gelato-hero{padding:130px 0 55px}.gelato-art{min-height:340px}.gelato-art img{max-width:330px}.gelato-feature-grid,.gelato-branches{grid-template-columns:1fr}.gelato-section{padding:65px 0}.gelato-art-sticker{right:4%;width:85px;height:85px;font-size:12px}}
 @media(prefers-reduced-motion:reduce){.gelato-art img{animation:none}}
+
+/* Admin and user-facing typography without third-party font downloads. */

@@ -1,0 +1,15 @@
+name: Build Navid Gelato
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: dotnet restore NavidGelato_Site.csproj
+      - run: dotnet build NavidGelato_Site.csproj --configuration Release --no-restore
