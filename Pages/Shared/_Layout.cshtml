@@ -3,9 +3,9 @@
 @using NavidGelato_Site.Services
 @inject SiteContentService SiteContent
 @{
-    var pageTitle = ViewData["Title"]?.ToString() ?? "نوید ژلاتو | ساندویچ‌های سرد و گرم";
-    var description = ViewData["Description"]?.ToString() ?? "نوید ژلاتو؛ ساندویچ‌های سرد و گرم با نام‌های شخصیت‌محور، منوی دیجیتال، قیمت روز، شعب و مسیریابی مستقیم.";
-    var canonical = ViewData["Canonical"]?.ToString() ?? "https://navidgelato.example/";
+    var pageTitle = ViewData["Title"]?.ToString() ?? "نوید ژلاتو | ژلاتوهای خوش‌طعم";
+    var description = ViewData["Description"]?.ToString() ?? "نوید ژلاتو؛ ژلاتو با طعم‌های متنوع، منوی دیجیتال، قیمت روز، شعب و مسیریابی مستقیم.";
+    var canonical = $"{ViewContext.HttpContext.Request.Scheme}://{ViewContext.HttpContext.Request.Host}{ViewContext.HttpContext.Request.PathBase}{ViewContext.HttpContext.Request.Path}";
     var httpRequest = ViewContext.HttpContext.Request;
     var requestPath = httpRequest.Path.Value?.TrimEnd('/') ?? string.Empty;
     var isHomePage = string.IsNullOrEmpty(requestPath) || requestPath.Equals("/Index", StringComparison.OrdinalIgnoreCase);
@@ -53,7 +53,7 @@
     <meta name="twitter:title" content="@pageTitle" />
     <meta name="twitter:description" content="@description" />
     <meta name="twitter:image" content="@ogImage" />
-    <meta name="theme-color" content="#8f1026" />
+    <meta name="theme-color" content="#d67c95" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/final-polish.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site-navigation.css" asp-append-version="true" />
@@ -65,6 +65,7 @@
     <link rel="stylesheet" href="~/css/site-cinematic-motion.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/public-toasts.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/all.css" />
+    <link rel="stylesheet" href="~/css/gelato-theme.css" asp-append-version="true" />
     @await RenderSectionAsync("Head", required: false)
     <script type="application/ld+json">
             {
@@ -72,23 +73,23 @@
               "@@graph": [
                 {
                   "@@type": "Organization",
-                  "@@id": "https://navidgelato.example/#organization",
+                  "@@id": "@canonical#organization",
                   "name": "نوید ژلاتو",
                   "alternateName": "NAVID GELATO",
-                  "url": "https://navidgelato.example/",
-                  "description": "نوید ژلاتو؛ برند ساندویچ‌های سرد و گرم با نام‌گذاری شخصیت‌محور و شعب متعدد در ایران.",
+                  "url": "@canonical",
+                  "description": "نوید ژلاتو؛ برند ژلاتوهای خوش‌طعم با نام‌گذاری شخصیت‌محور و شعب متعدد در ایران.",
                   "image": "@brandBannerUrl",
                   "logo": "@logoUrl",
                   "sameAs": ["https://www.instagram.com/navid_gelato/"]
                 },
                 {
                   "@@type": "WebSite",
-                  "@@id": "https://navidgelato.example/#website",
-                  "url": "https://navidgelato.example/",
+                  "@@id": "@canonical#website",
+                  "url": "@canonical",
                   "name": "نوید ژلاتو",
                   "alternateName": "NAVID GELATO",
                   "inLanguage": "fa-IR",
-                  "publisher": { "@@id": "https://navidgelato.example/#organization" }
+                  "publisher": { "@@id": "@canonical#organization" }
                 }
               ]
             }
@@ -136,10 +137,10 @@
 
 <footer class="site-footer">
     <div class="container footer-grid">
-        <div><a class="brand footer-brand" asp-page="/Index"><img class="brand-mark brand-logo-image" src="@logoPath" alt="لوگوی نوید ژلاتو" /><span class="brand-copy"><b>NAVID GELATO</b><small>نوید ژلاتو</small></span></a><p>نوید ژلاتو؛ ساندویچ‌های سرد و گرم با شخصیت‌های خاص خودش.</p></div>
+        <div><a class="brand footer-brand" asp-page="/Index"><img class="brand-mark brand-logo-image" src="@logoPath" alt="لوگوی نوید ژلاتو" /><span class="brand-copy"><b>NAVID GELATO</b><small>نوید ژلاتو</small></span></a><p>نوید ژلاتو؛ ژلاتوهای خوش‌طعم با شخصیت‌های خاص خودش.</p></div>
         <div><h3>دسترسی سریع</h3><a asp-page="/Menu">منوی دیجیتال</a><a asp-page="/Branches">شعب نوید ژلاتو</a><a asp-page="/Franchise">درخواست فرانچایز</a><a asp-page="/Contact">ارتباط با ما</a></div>
-        <div><h3>شعبه مرکزی</h3><p>کرج، عظیمیه، پایین‌تر از میدان اسبی، بین خیابان خیام و ارکیده</p><a href="tel:02632527272" dir="ltr">026 3252 7272</a></div>
-            <div><h3>شبکه اجتماعی</h3><a href="https://www.instagram.com/navid_gelato/" rel="noopener" target="_blank"><i class="fa-brands fa-instagram" style="width: 1rem;height: 1rem;padding-left: 4px;"></i>navid_gelato</a><span class="footer-hours">همه‌روزه ۱۰ صبح تا ۱۲ شب</span></div>
+        <div><h3>شعب</h3><p>اطلاعات شعب و آدرس‌ها از پنل مدیریت منتشر می‌شود.</p></div>
+        <div><h3>شبکه اجتماعی</h3><a href="https://www.instagram.com/navid_gelato/" rel="noopener" target="_blank"><i class="fa-brands fa-instagram" style="width: 1rem;height: 1rem;padding-left: 4px;"></i>navid_gelato</a><span class="footer-hours">ساعت کاری هر شعبه از اطلاعات همان شعبه اعلام می‌شود</span></div>
     </div>
     @if (showEnamad)
     {

@@ -43,7 +43,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Admin/Login";
     options.AccessDeniedPath = "/Admin/AccessDenied";
-    options.Cookie.Name = "NavidPro.Identity";
+    options.Cookie.Name = "NavidGelato.Identity";
     options.Cookie.HttpOnly = true;
     options.Cookie.SameSite = SameSiteMode.Lax;
     options.SlidingExpiration = true;
@@ -71,7 +71,7 @@ builder.Services.AddHttpClient<ISepPaymentGateway, SepPaymentGateway>(client => 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.Cookie.Name = "NavidPro.Session";
+    options.Cookie.Name = "NavidGelato.Session";
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
     options.IdleTimeout = TimeSpan.FromMinutes(20);
@@ -126,8 +126,8 @@ app.UseAuthorization();
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
-    options.SwaggerEndpoint("v1/swagger.json", "NavidPro Branch API v1");
-    options.DocumentTitle = "NavidPro API";
+    options.SwaggerEndpoint("v1/swagger.json", "Navid Gelato API v1");
+    options.DocumentTitle = "Navid Gelato API";
 });
 
 await DatabaseSeeder.InitializeAsync(app.Services);

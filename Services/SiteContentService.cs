@@ -6,12 +6,12 @@ namespace NavidGelato_Site.Services;
 
 public sealed class SiteContentService(AppDbContext db)
 {
-    public const string LogoImage = "~/img/logo.png";
-    public const string BrandHeroImage = "~/img/barbar.png";
-    public const string BrandBannerImage = "~/img/logo.png";
-    public const string StoreImage = "~/img/blog.jpg";
-    public const string ArcherImage = "~/img/barbar.png";
-    public const string ClanImage = "~/img/giant.png";
+    public const string LogoImage = "~/img/logo.svg";
+    public const string BrandHeroImage = "~/img/gelato-hero.svg";
+    public const string BrandBannerImage = "~/img/logo.svg";
+    public const string StoreImage = "~/img/gelato-banner.svg";
+    public const string ArcherImage = "~/img/gelato-hero.svg";
+    public const string ClanImage = "~/img/gelato-hero.svg";
 
     public Task<SiteSettings?> GetSiteSettingsAsync() => db.SiteSettings
         .AsNoTracking()
